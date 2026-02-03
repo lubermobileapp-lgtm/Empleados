@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de Aceptaciones - Luber Admin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 30px;
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 2em;
+    }
+
+    .subtitle {
+      color: #999;
+      margin-bottom: 30px;
+    }
+
+    .filters-section {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border-left: 4px solid #667eea;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.9em;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 0.9em;
+      transition: border-color 0.3s;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 0.9em;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #999;
+      transition: all 0.3s;
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab:hover {
+      color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+    }
+
+    thead {
+      background: #f5f5f5;
+      border-bottom: 2px solid #ddd;
+    }
+
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+
+    .status-accepted {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .status-completed {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    .status-cancelled {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+
+    .status-no-show {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-card.secondary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: 700;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.8em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-complete {
+      background: #4caf50;
+      color: white;
+    }
+
+    .btn-complete:hover {
+      background: #45a049;
+    }
+
+    .btn-cancel {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #da190b;
+    }
+
+    .btn-view {
+      background: #2196f3;
+      color: white;
+    }
+
+    .btn-view:hover {
+      background: #0b7dda;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #ffebee;
+      color: #c62828;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      border-left: 4px solid #c62828;
+    }
+
+    .success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      border-left: 4px solid #2e7d32;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 15px;
+    }
+
+    .modal-header h2 {
+      color: #667eea;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 20px;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .info-value {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Reporte de Aceptaciones de Empleados</h1>
+    <p class="subtitle">Monitorea y gestiona todas las aceptaciones de ofertas y horarios</p>
+
+    <div id="message"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="summary">📈 Resumen</button>
+      <button class="tab" data-tab="all-acceptances">📋 Todas las Aceptaciones</button>
+      <button class="tab" data-tab="by-employee">👥 Por Empleado</button>
+      <button class="tab" data-tab="by-date">📅 Por Fecha</button>
+    </div>
+
+    <!-- SUMMARY TAB -->
+    <div id="summary" class="tab-content active">
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="summaryDateFrom">Fecha Desde:</label>
+            <input type="date" id="summaryDateFrom">
+          </div>
+          <div class="filter-group">
+            <label for="summaryDateTo">Fecha Hasta:</label>
+            <input type="date" id="summaryDateTo">
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn-primary" onclick="loadSummary()">Cargar Resumen</button>
+          <button class="btn-secondary" onclick="exportToCSV('summary')">📥 Descargar CSV</button>
+        </div>
+      </div>
+
+      <div id="summaryStats" class="stats-grid"></div>
+      <div class="table-wrapper">
+        <table id="summaryTable">
+          <thead>
+            <tr>
+              <th>Empleado</th>
+              <th>Email</th>
+              <th>Total Aceptaciones</th>
+              <th>Completadas</th>
+              <th>En Proceso</th>
+              <th>Canceladas</th>
+              <th>Ganancias Totales</th>
+              <th>Última Aceptación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALL ACCEPTANCES TAB -->
+    <div id="all-acceptances" class="tab-content">
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="acceptanceStatus">Estado:</label>
+            <select id="acceptanceStatus">
+              <option value="">Todos</option>
+              <option value="accepted">Aceptadas</option>
+              <option value="completed">Completadas</option>
+              <option value="cancelled">Canceladas</option>
+              <option value="no-show">No Show</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="acceptanceDateFrom">Fecha Desde:</label>
+            <input type="date" id="acceptanceDateFrom">
+          </div>
+          <div class="filter-group">
+            <label for="acceptanceDateTo">Fecha Hasta:</label>
+            <input type="date" id="acceptanceDateTo">
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn-primary" onclick="loadAllAcceptances()">Cargar</button>
+          <button class="btn-secondary" onclick="exportToCSV('acceptances')">📥 Descargar CSV</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="acceptancesTable">
+          <thead>
+            <tr>
+              <th>Empleado</th>
+              <th>Fecha del Servicio</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Precio</th>
+              <th>Aceptada</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="acceptancesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BY EMPLOYEE TAB -->
+    <div id="by-employee" class="tab-content">
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="employeeSelect">Seleccionar Empleado:</label>
+            <select id="employeeSelect"></select>
+          </div>
+          <div class="filter-group">
+            <label for="employeeStatus">Estado:</label>
+            <select id="employeeStatus">
+              <option value="">Todos</option>
+              <option value="accepted">Aceptadas</option>
+              <option value="completed">Completadas</option>
+              <option value="cancelled">Canceladas</option>
+            </select>
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn-primary" onclick="loadByEmployee()">Cargar</button>
+          <button class="btn-secondary" onclick="exportToCSV('employee')">📥 Descargar CSV</button>
+        </div>
+      </div>
+
+      <div id="employeeInfo"></div>
+      <div class="table-wrapper">
+        <table id="employeeTable">
+          <thead>
+            <tr>
+              <th>Fecha del Servicio</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Precio</th>
+              <th>Tipo de Aceptación</th>
+              <th>Aceptada</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="employeeBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BY DATE TAB -->
+    <div id="by-date" class="tab-content">
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="dateFromFilter">Fecha Desde:</label>
+            <input type="date" id="dateFromFilter">
+          </div>
+          <div class="filter-group">
+            <label for="dateToFilter">Fecha Hasta:</label>
+            <input type="date" id="dateToFilter">
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn-primary" onclick="loadByDate()">Cargar</button>
+          <button class="btn-secondary" onclick="exportToCSV('date')">📥 Descargar CSV</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="dateTable">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Total Aceptaciones</th>
+              <th>Ganancias</th>
+              <th>Tipos de Aceptación</th>
+            </tr>
+          </thead>
+          <tbody id="dateBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Detalles de la Aceptación</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cerrar</button>
+        <button class="btn-complete" id="completeBtn" style="display:none;" onclick="completeAcceptance()">Completar</button>
+        <button class="btn-cancel" id="cancelBtn" style="display:none;" onclick="cancelAcceptance()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentAcceptanceId = null;
+    let currentAcceptanceData = null;
+
+    // Initialize
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        e.target.classList.add('active');
+        document.getElementById(e.target.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.value = today;
+    });
+
+    // Load employees for filter
+    async function loadEmployeeFilter() {
+      try {
+        const res = await fetch('/api/admin/employees-approval');
+        const employees = await res.json();
+        const select = document.getElementById('employeeSelect');
+        select.innerHTML = '<option value="">-- Seleccionar Empleado --</option>';
+        if (Array.isArray(employees)) {
+          employees.forEach(emp => {
+            const option = document.createElement('option');
+            option.value = emp._id;
+            option.textContent = `${emp.firstName} ${emp.lastName}`;
+            select.appendChild(option);
+          });
+        }
+      } catch (err) {
+        console.error('Error loading employees:', err);
+      }
+    }
+
+    async function loadSummary() {
+      showMessage('Cargando resumen...', 'info');
+      try {
+        const dateFrom = document.getElementById('summaryDateFrom').value;
+        const dateTo = document.getElementById('summaryDateTo').value;
+        
+        const res = await fetch(`/api/admin/acceptances-summary?dateFrom=${dateFrom}&dateTo=${dateTo}`);
+        const data = await res.json();
+
+        // Stats
+        let totalAcceptances = 0;
+        let totalEarnings = 0;
+        let totalCompleted = 0;
+
+        if (Array.isArray(data.summary)) {
+          data.summary.forEach(item => {
+            totalAcceptances += item.totalAcceptances;
+            totalEarnings += item.totalEarnings;
+            totalCompleted += item.completedCount;
+          });
+        }
+
+        const statsHtml = `
+          <div class="stat-card">
+            <div class="stat-label">Total Aceptaciones</div>
+            <div class="stat-value">${totalAcceptances}</div>
+          </div>
+          <div class="stat-card secondary">
+            <div class="stat-label">Ganancias Totales</div>
+            <div class="stat-value">$${totalEarnings.toFixed(2)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Completadas</div>
+            <div class="stat-value">${totalCompleted}</div>
+          </div>
+        `;
+        document.getElementById('summaryStats').innerHTML = statsHtml;
+
+        // Table
+        const tbody = document.getElementById('summaryBody');
+        tbody.innerHTML = '';
+        if (Array.isArray(data.summary)) {
+          data.summary.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><strong>${item.employeeName} ${item.employeeLastName}</strong></td>
+              <td>${item.employeeEmail}</td>
+              <td>${item.totalAcceptances}</td>
+              <td>${item.completedCount}</td>
+              <td>${item.acceptedCount}</td>
+              <td>${item.cancelledCount}</td>
+              <td>$${item.totalEarnings.toFixed(2)}</td>
+              <td>${new Date(item.lastAcceptanceDate).toLocaleDateString('es-MX')}</td>
+              <td>
+                <button class="btn-small btn-view" onclick="loadByEmployee('${item._id}')">Ver Detalles</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+
+        showMessage(`✅ Resumen cargado: ${data.total || 0} empleados`, 'success');
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function loadAllAcceptances() {
+      showMessage('Cargando aceptaciones...', 'info');
+      try {
+        const status = document.getElementById('acceptanceStatus').value;
+        const dateFrom = document.getElementById('acceptanceDateFrom').value;
+        const dateTo = document.getElementById('acceptanceDateTo').value;
+        
+        let url = '/api/admin/employee-acceptances';
+        const params = new URLSearchParams();
+        if (status) params.append('status', status);
+        if (dateFrom) params.append('dateFrom', dateFrom);
+        if (dateTo) params.append('dateTo', dateTo);
+        if (params.toString()) url += '?' + params.toString();
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const tbody = document.getElementById('acceptancesBody');
+        tbody.innerHTML = '';
+        if (Array.isArray(data.acceptances)) {
+          data.acceptances.forEach(acceptance => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><strong>${acceptance.employeeInfo.firstName} ${acceptance.employeeInfo.lastName}</strong></td>
+              <td>${acceptance.scheduleInfo.date}</td>
+              <td>${acceptance.scheduleInfo.time}</td>
+              <td>${acceptance.scheduleInfo.customerName}</td>
+              <td>$${acceptance.scheduleInfo.price.toFixed(2)}</td>
+              <td>${new Date(acceptance.acceptedAt).toLocaleDateString('es-MX')} ${new Date(acceptance.acceptedAt).toLocaleTimeString('es-MX')}</td>
+              <td><span class="status-badge status-${acceptance.status}">${acceptance.status}</span></td>
+              <td>
+                <button class="btn-small btn-view" onclick="viewDetails('${acceptance._id}')">Ver</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+
+        showMessage(`✅ Cargadas ${data.total || 0} aceptaciones`, 'success');
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function loadByEmployee(empId) {
+      showMessage('Cargando datos del empleado...', 'info');
+      try {
+        const employeeId = empId || document.getElementById('employeeSelect').value;
+        if (!employeeId) {
+          showMessage('❌ Por favor selecciona un empleado', 'error');
+          return;
+        }
+
+        const status = document.getElementById('employeeStatus').value;
+        let url = `/api/admin/employee-acceptances/${employeeId}`;
+        if (status) url += `?status=${status}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        // Employee info
+        if (data.employee) {
+          document.getElementById('employeeInfo').innerHTML = `
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+              <h3>${data.employee.firstName} ${data.employee.lastName}</h3>
+              <p>Email: ${data.employee.email}</p>
+              <p>Teléfono: ${data.employee.phone}</p>
+            </div>
+          `;
+        }
+
+        // Table
+        const tbody = document.getElementById('employeeBody');
+        tbody.innerHTML = '';
+        if (Array.isArray(data.acceptances)) {
+          data.acceptances.forEach(acceptance => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${acceptance.scheduleInfo.date}</td>
+              <td>${acceptance.scheduleInfo.time}</td>
+              <td>${acceptance.scheduleInfo.customerName}</td>
+              <td>$${acceptance.scheduleInfo.price.toFixed(2)}</td>
+              <td><span style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 0.85em;">${acceptance.acceptanceType}</span></td>
+              <td>${new Date(acceptance.acceptedAt).toLocaleDateString('es-MX')}</td>
+              <td><span class="status-badge status-${acceptance.status}">${acceptance.status}</span></td>
+              <td>
+                <button class="btn-small btn-view" onclick="viewDetails('${acceptance._id}')">Ver</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+
+        showMessage(`✅ Cargadas ${data.total || 0} aceptaciones`, 'success');
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function loadByDate() {
+      showMessage('Cargando por fecha...', 'info');
+      try {
+        const dateFrom = document.getElementById('dateFromFilter').value;
+        const dateTo = document.getElementById('dateToFilter').value;
+        
+        let url = '/api/admin/acceptances-by-date';
+        const params = new URLSearchParams();
+        if (dateFrom) params.append('dateFrom', dateFrom);
+        if (dateTo) params.append('dateTo', dateTo);
+        if (params.toString()) url += '?' + params.toString();
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const tbody = document.getElementById('dateBody');
+        tbody.innerHTML = '';
+        if (Array.isArray(data.byDate)) {
+          data.byDate.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><strong>${item._id}</strong></td>
+              <td>${item.count}</td>
+              <td>$${item.totalEarnings.toFixed(2)}</td>
+              <td>${item.acceptanceTypes.filter((v, i, a) => a.indexOf(v) === i).join(', ')}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+
+        showMessage(`✅ Cargadas ${data.total || 0} fechas`, 'success');
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function viewDetails(acceptanceId) {
+      try {
+        // Fetch all acceptances to find the one with matching ID
+        const res = await fetch('/api/admin/employee-acceptances');
+        const data = await res.json();
+        if (!Array.isArray(data.acceptances)) {
+          showMessage('❌ Error: datos inválidos', 'error');
+          return;
+        }
+        const acceptance = data.acceptances.find(a => a._id === acceptanceId);
+        
+        if (!acceptance) {
+          showMessage('❌ Aceptación no encontrada', 'error');
+          return;
+        }
+
+        currentAcceptanceId = acceptanceId;
+        currentAcceptanceData = acceptance;
+
+        const html = `
+          <div class="info-row">
+            <div class="info-label">Empleado:</div>
+            <div class="info-value">${acceptance.employeeInfo.firstName} ${acceptance.employeeInfo.lastName}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Email:</div>
+            <div class="info-value">${acceptance.employeeInfo.email}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Teléfono:</div>
+            <div class="info-value">${acceptance.employeeInfo.phone}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Dirección:</div>
+            <div class="info-value">${acceptance.employeeInfo.address}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Fecha del Servicio:</div>
+            <div class="info-value">${acceptance.scheduleInfo.date}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Hora:</div>
+            <div class="info-value">${acceptance.scheduleInfo.time}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Cliente:</div>
+            <div class="info-value">${acceptance.scheduleInfo.customerName}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Tipo de Cliente:</div>
+            <div class="info-value">${acceptance.scheduleInfo.customerType || 'N/A'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Precio:</div>
+            <div class="info-value">$${acceptance.scheduleInfo.price.toFixed(2)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Ubicación:</div>
+            <div class="info-value">${acceptance.scheduleInfo.location || 'N/A'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Tipo de Aceptación:</div>
+            <div class="info-value">${acceptance.acceptanceType}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Estado:</div>
+            <div class="info-value"><span class="status-badge status-${acceptance.status}">${acceptance.status}</span></div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Aceptada:</div>
+            <div class="info-value">${new Date(acceptance.acceptedAt).toLocaleString('es-MX')}</div>
+          </div>
+          ${acceptance.completedAt ? `
+            <div class="info-row">
+              <div class="info-label">Completada:</div>
+              <div class="info-value">${new Date(acceptance.completedAt).toLocaleString('es-MX')}</div>
+            </div>
+          ` : ''}
+          ${acceptance.notes ? `
+            <div class="info-row">
+              <div class="info-label">Notas:</div>
+              <div class="info-value">${acceptance.notes}</div>
+            </div>
+          ` : ''}
+        `;
+
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('completeBtn').style.display = acceptance.status === 'accepted' ? 'block' : 'none';
+        document.getElementById('cancelBtn').style.display = ['accepted', 'completed'].includes(acceptance.status) ? 'block' : 'none';
+
+        document.getElementById('detailModal').classList.add('active');
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+      currentAcceptanceId = null;
+    }
+
+    async function completeAcceptance() {
+      try {
+        const res = await fetch(`/api/admin/acceptances/${currentAcceptanceId}/complete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes: prompt('Notas (opcional):') || '' })
+        });
+
+        if (res.ok) {
+          showMessage('✅ Aceptación completada', 'success');
+          closeModal();
+          loadAllAcceptances();
+        } else {
+          showMessage('❌ Error al completar', 'error');
+        }
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function cancelAcceptance() {
+      if (!confirm('¿Estás seguro de cancelar?')) return;
+
+      try {
+        const res = await fetch(`/api/admin/acceptances/${currentAcceptanceId}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes: prompt('Motivo de cancelación (opcional):') || '' })
+        });
+
+        if (res.ok) {
+          showMessage('✅ Aceptación cancelada', 'success');
+          closeModal();
+          loadAllAcceptances();
+        } else {
+          showMessage('❌ Error al cancelar', 'error');
+        }
+      } catch (err) {
+        showMessage(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    function showMessage(text, type = 'info') {
+      const msg = document.getElementById('message');
+      msg.innerHTML = `<div class="${type}">${text}</div>`;
+      if (type !== 'error') setTimeout(() => msg.innerHTML = '', 3000);
+    }
+
+    function exportToCSV(section) {
+      let data = [];
+      let filename = `reporte_${new Date().toISOString().split('T')[0]}.csv`;
+
+      if (section === 'summary') {
+        const table = document.getElementById('summaryTable');
+        data = getTableData(table);
+        filename = `resumen_aceptaciones_${new Date().toISOString().split('T')[0]}.csv`;
+      } else if (section === 'acceptances') {
+        const table = document.getElementById('acceptancesTable');
+        data = getTableData(table);
+        filename = `todas_aceptaciones_${new Date().toISOString().split('T')[0]}.csv`;
+      } else if (section === 'employee') {
+        const table = document.getElementById('employeeTable');
+        data = getTableData(table);
+        filename = `empleado_aceptaciones_${new Date().toISOString().split('T')[0]}.csv`;
+      } else if (section === 'date') {
+        const table = document.getElementById('dateTable');
+        data = getTableData(table);
+        filename = `aceptaciones_fecha_${new Date().toISOString().split('T')[0]}.csv`;
+      }
+
+      const csv = data.map(row => row.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    function getTableData(table) {
+      const data = [];
+      const headers = [];
+      
+      // Get headers
+      const headerElements = table.querySelectorAll('thead th');
+      if (headerElements && headerElements.length > 0) {
+        headerElements.forEach(th => {
+          headers.push(th.textContent.trim());
+        });
+        data.push(headers);
+      }
+
+      // Get rows
+      const rowElements = table.querySelectorAll('tbody tr');
+      if (rowElements && rowElements.length > 0) {
+        rowElements.forEach(tr => {
+          const row = [];
+          const cellElements = tr.querySelectorAll('td');
+          if (cellElements && cellElements.length > 0) {
+            cellElements.forEach((td, index) => {
+              if (index < headers.length - 1) { // Exclude action column
+                row.push(`"${td.textContent.trim()}"`);
+              }
+            });
+          }
+          if (row.length > 0) data.push(row);
+        });
+      }
+
+      return data;
+    }
+
+    // Load employee filter on init
+    loadEmployeeFilter();
+    loadSummary();
+  </script>
+</body>
+</html>

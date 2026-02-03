@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Card Design Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .card-example {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-title {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f4ff;
+        }
+        
+        /* Schedule list item */
+        .schedule-list-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 244, 255, 0.8) 100%);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #3498db;
+            border-radius: 8px;
+            border: 1px solid rgba(52, 152, 219, 0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .schedule-list-item:hover {
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .date-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .offer-badge {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .customer-name {
+            font-weight: bold;
+            color: #333;
+            margin: 8px 0;
+        }
+        
+        .customer-address {
+            color: #3498db;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+        
+        /* Toggle button */
+        .toggle-vehicles {
+            margin-top: 10px;
+            color: #3498db;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(41, 128, 185, 0.05) 100%);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .toggle-vehicles:hover {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.15) 0%, rgba(41, 128, 185, 0.1) 100%);
+            border-color: #3498db;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+            transform: translateX(2px);
+        }
+        
+        /* Vehicle details */
+        .vehicle-details {
+            margin-top: 12px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .vehicle-details.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Vehicle card */
+        .vehicle-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f4ff 100%);
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 16px;
+            align-items: start;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .vehicle-card:hover {
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
+            border-color: #2980b9;
+        }
+        
+        .vehicle-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .vehicle-image {
+            width: 100%;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .vehicle-info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding-left: 8px;
+        }
+        
+        .vehicle-info-item {
+            display: flex;
+            flex-direction: column;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.1);
+        }
+        
+        .vehicle-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .vehicle-info-item strong {
+            color: #3498db;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        
+        .vehicle-info-item span {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        
+        .price {
+            color: #1db15a;
+            font-weight: 700;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .accept-button {
+            flex: 1;
+            min-width: 100px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #1db15a 0%, #17944f 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(29, 177, 90, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .accept-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(29, 177, 90, 0.4);
+        }
+        
+        .dispatch-button {
+            padding: 6px 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .dispatch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        }
+        
+        .responsive-info {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .responsive-info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .responsive-info ul {
+            margin-left: 20px;
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        @media (max-width: 768px) {
+            .vehicle-card {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .vehicle-image {
+                height: 150px;
+                max-width: 100%;
+            }
+            
+            .vehicle-info-grid {
+                padding-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏎️ Vehicle Card Design</h1>
+            <p>Modern Racing-Inspired Professional Layout</p>
+        </div>
+        
+        <div class="card-example">
+            <div class="card-title">📋 Schedule Item Example</div>
+            
+            <div class="schedule-list-item">
+                <div class="schedule-header">
+                    <div class="date-badge">📅 2024-02-04 @ 09:00 AM</div>
+                    <div class="offer-badge">Offer: $37.50</div>
+                </div>
+                
+                <div style="text-align: center; margin: 8px 0;">
+                    <button class="dispatch-button">📊 Dispatch Status</button>
+                </div>
+                
+                <div class="customer-name">Customer 3</div>
+                <div class="customer-address">📍 91 High St, Winter Haven, FL 33880</div>
+                
+                <div style="margin-bottom: 4px;">
+                    <strong>Account type:</strong> Customer
+                </div>
+                
+                <!-- Toggle Vehicles Button -->
+                <div class="toggle-vehicles" onclick="toggleVehicle()">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233498db'%3E%3Cpath d='M18.92 6.01C18.72 5.42 18.16 5 17.5 5H6.5c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .5.5 1 1 1h1c.5 0 1-.5 1-1v-1h12v1c0 .5.5 1 1 1h1c.5 0 1-.5 1-1v-8l-2.08-5.99zM6.5 7h11l1.96 5.5H4.54L6.5 7zm6 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/%3E%3C/svg%3E" alt="Vehicle" style="width: 18px; height: 18px;">
+                    <span>🏎️ View vehicle(s) Details</span>
+                </div>
+                
+                <!-- Vehicle Details (Expandable) -->
+                <div class="vehicle-details" id="vehicle-details">
+                    <div class="vehicle-card">
+                        <div class="vehicle-image">Vehicle Image</div>
+                        
+                        <div class="vehicle-info-grid">
+                            <div class="vehicle-info-item">
+                                <strong>Vehicle</strong>
+                                <span>2011 Dodge Ram 3500 SLT</span>
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Price</strong>
+                                <span class="price">$150</span>
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Oil Type</strong>
+                                <span>Full Synthetic</span>
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Engine</strong>
+                                <span>3.8L</span>
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Filters</strong>
+                                <span>Air: ❌ | Cabin: ❌</span>
+                            </div>
+                            <div class="vehicle-info-item">
+                                <strong>Plate</strong>
+                                <span style="font-family: monospace; letter-spacing: 2px; font-weight: 700;">*-*-828</span>
+                            </div>
+                            <div class="vehicle-info-item" style="border-bottom: none; padding-bottom: 0;">
+                                <strong>Service Location</strong>
+                                <span>91 High St, Winter Haven, FL 33880</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="accept-button">✅ Accept Offer</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-example">
+            <div class="card-title">✨ Design Features</div>
+            <div class="responsive-info">
+                <h3>🎨 Visual Improvements:</h3>
+                <ul>
+                    <li><strong>Racing Style:</strong> Modern gradients and sleek design</li>
+                    <li><strong>Professional Layout:</strong> Clear information hierarchy</li>
+                    <li><strong>Responsive Design:</strong> Works on mobile, tablet, and desktop</li>
+                    <li><strong>Smooth Animations:</strong> Expand/collapse with elegant transitions</li>
+                    <li><strong>Better Buttons:</strong> Enhanced hover effects and shadows</li>
+                    <li><strong>Organized Info:</strong> All vehicle data in clean grid layout</li>
+                    <li><strong>Color Coded:</strong> Price in green, vehicle info in blue</li>
+                    <li><strong>Accessibility:</strong> Maintains readability at all sizes</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card-example">
+            <div class="card-title">📱 Responsive Breakpoints</div>
+            <div class="responsive-info">
+                <h3>🎯 Device-Specific Optimizations:</h3>
+                <ul>
+                    <li><strong>Mobile (< 480px):</strong> Single column, compact layout</li>
+                    <li><strong>Small Devices (480-768px):</strong> 150px image + info</li>
+                    <li><strong>Tablets (769-1024px):</strong> 180px image + info</li>
+                    <li><strong>Desktop (> 1024px):</strong> 200px image + full details</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleVehicle() {
+            const details = document.getElementById('vehicle-details');
+            details.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

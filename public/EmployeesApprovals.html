@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprobación de Empleados - Luber</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('https://res.cloudinary.com/dsu6g9dym/image/upload/v1767288483/luber_uploads/profileImage-1767288482268.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, rgba(20, 20, 30, 0.96) 0%, rgba(40, 40, 60, 0.96) 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 4px solid #667eea;
+        }
+
+        .logo {
+            height: 45px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, #f7f8fa 0%, #ffffff 100%);
+            border-bottom: 2px solid #e0e3e8;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 11px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+            background: #fafbff;
+        }
+
+        /* DOS SECCIONES SEPARADAS */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            padding: 25px;
+        }
+
+        .section-container {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e4e8;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 18px 20px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .section-count {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* TABLE STYLES */
+        .content .content {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin: 0;
+        }
+
+        .section-container table {
+            background: transparent;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #f3f5f8 0%, #e8ecf1 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #2c3e50;
+            border-bottom: 2px solid #dde2e8;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 13px 16px;
+            border-bottom: 1px solid #e8ecf1;
+        }
+
+        tbody tr {
+            transition: all 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f7f9fc;
+        }
+
+        tbody tr.expanded {
+            background: #f0f4ff;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+        }
+
+        .expand-btn.open {
+            transform: rotate(180deg);
+        }
+
+        .employee-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .employee-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .employee-email {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-partial {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-approve-all {
+            color: white;
+        }
+
+        /* Estados de aprobación */
+        .btn-approve-all.approved {
+            background: #28a745;
+        }
+
+        .btn-approve-all.approved:hover:not(:disabled) {
+            background: #218838;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-approve-all.pending {
+            background: #dc3545;
+        }
+
+        .btn-approve-all.pending:hover:not(:disabled) {
+            background: #c82333;
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-approve-all:hover:not(:disabled) {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-approve-all:disabled {
+            background: #28a745;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+            box-shadow: 0 3px 10px rgba(23, 162, 184, 0.3);
+        }
+
+        /* EXPANDED ROW */
+        .expanded-row {
+            display: none;
+        }
+
+        .expanded-row.show {
+            display: table-row;
+        }
+
+        .expanded-content {
+            padding: 20px 16px;
+            background: #f9fafb;
+            border-top: 2px solid #e0e3e8;
+        }
+
+        .expanded-inner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .documents-section {
+            grid-column: 1 / -1;
+        }
+
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .document-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .document-card:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+        }
+
+        .doc-icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+
+        .doc-name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .doc-action {
+            padding: 6px 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .doc-action:hover {
+            background: #764ba2;
+        }
+
+        .doc-approved {
+            background: #28a745;
+        }
+
+        .doc-approved:hover {
+            background: #218838;
+        }
+
+        .approval-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .approval-actions .btn-approve-all {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+
+        .approval-actions .action-btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* LOADING & EMPTY */
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .no-data-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .no-data h2 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .document-viewer {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+            overflow: auto;
+        }
+
+        .document-viewer img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* NOTIFICATIONS */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            z-index: 2000;
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .expanded-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box,
+            .filter-buttons {
+                width: 100%;
+            }
+
+            .filter-buttons {
+                justify-content: stretch;
+            }
+
+            .filter-buttons .btn-secondary {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 10px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px 20px;
+                gap: 12px;
+            }
+
+            .header-title h1 {
+                font-size: 1.4rem;
+                justify-content: center;
+            }
+
+            .logo {
+                height: 40px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 12px 20px;
+                gap: 10px;
+            }
+
+            .search-box input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
+            th {
+                font-size: 0.8rem;
+            }
+
+            .action-cell {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .action-btn {
+                width: 100%;
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+
+            .expanded-content {
+                padding: 15px 12px;
+            }
+
+            .documents-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section {
+                padding: 12px;
+            }
+
+            .modal-content {
+                max-width: 95%;
+                padding: 20px;
+            }
+
+            .document-viewer {
+                height: 400px;
+            }
+
+            .approval-actions {
+                flex-direction: column;
+            }
+
+            .approval-actions .action-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title h1 {
+                font-size: 1.2rem;
+            }
+
+            .header-title p {
+                font-size: 0.8rem;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+
+            .employee-name {
+                font-size: 0.85rem;
+            }
+
+            .employee-email {
+                font-size: 0.75rem;
+            }
+
+            .status-badge {
+                padding: 4px 8px;
+                font-size: 0.7rem;
+            }
+
+            .btn-approve-all,
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .doc-icon {
+                font-size: 1.5rem;
+            }
+
+            .expanded-inner {
+                gap: 12px;
+            }
+
+            .section {
+                padding: 10px;
+            }
+
+            .detail-label {
+                font-size: 0.7rem;
+            }
+
+            .detail-value {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://res.cloudinary.com/dsu6g9dym/image/upload/v1755006521/logo_hjrj3p.png" alt="Luber Logo" class="logo">
+            <div class="header-title">
+                <h1>📋 Aprobación de Empleados</h1>
+                <p>Gestiona y aprueba documentos de empleados</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre o email...">
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- SECCIÓN 1: WAITING APPROVAL -->
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>⏳ En Espera de Aprobación</h2>
+                    <span class="section-count" id="pendingCount">0</span>
+                </div>
+                
+                <div id="loadingContainerPending" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Cargando empleados...</p>
+                </div>
+
+                <div id="tableContainerPending" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 4%"></th>
+                                <th style="width: 28%">Empleado</th>
+                                <th style="width: 20%">Contacto</th>
+                                <th style="width: 28%">Estado de Aprobación</th>
+                                <th style="width: 20%">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBodyPending">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noDataContainerPending" class="no-data" style="display: none;">
+                    <div class="no-data-icon">✅</div>
+                    <h2>¡Todos Aprobados!</h2>
+                    <p>No hay empleados en espera de aprobación</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: APPROVED -->
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>✅ Aprobados</h2>
+                    <span class="section-count" id="approvedCount">0</span>
+                </div>
+                
+                <div id="loadingContainerApproved" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Cargando empleados...</p>
+                </div>
+
+                <div id="tableContainerApproved" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 4%"></th>
+                                <th style="width: 28%">Empleado</th>
+                                <th style="width: 20%">Contacto</th>
+                                <th style="width: 28%">Estado de Aprobación</th>
+                                <th style="width: 20%">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBodyApproved">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noDataContainerApproved" class="no-data" style="display: none;">
+                    <div class="no-data-icon">📭</div>
+                    <h2>Sin Aprobados</h2>
+                    <p>No hay empleados completamente aprobados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver documentos -->
+    <div id="documentModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeDocumentModal()">×</button>
+            <h2 style="margin-bottom: 20px; color: #333;">Documento: <span id="modalDocumentTitle"></span></h2>
+            <div class="document-viewer">
+                <img id="modalDocumentImage" src="" alt="Documento">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeDocumentModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allEmployees = [];
+        let expandedEmployeeId = null;
+
+        document.addEventListener('DOMContentLoaded', loadEmployees);
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            filterEmployees(e.target.value);
+        });
+
+        async function loadEmployees() {
+            // Mostrar loading en ambas secciones
+            document.getElementById('loadingContainerPending').style.display = 'block';
+            document.getElementById('loadingContainerApproved').style.display = 'block';
+            document.getElementById('tableContainerPending').style.display = 'none';
+            document.getElementById('tableContainerApproved').style.display = 'none';
+            document.getElementById('noDataContainerPending').style.display = 'none';
+            document.getElementById('noDataContainerApproved').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/admin/employees-approval');
+                if (!response.ok) throw new Error('Error al cargar empleados');
+
+                allEmployees = await response.json();
+                renderBothTables();
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error al cargar los empleados', 'error');
+                document.getElementById('noDataContainerPending').style.display = 'flex';
+                document.getElementById('noDataContainerApproved').style.display = 'flex';
+            } finally {
+                document.getElementById('loadingContainerPending').style.display = 'none';
+                document.getElementById('loadingContainerApproved').style.display = 'none';
+            }
+        }
+
+        function renderBothTables() {
+            // Separar empleados en dos grupos
+            // Pendientes: Si no tienen alguno de los 4 documentos aprobado (y si tiene resumeDocumentPath)
+            const pendingEmployees = allEmployees.filter(e => {
+                const requiresResume = e.resumeDocumentPath ? true : false;
+                if (requiresResume) {
+                    return !e.idApproved || !e.ssnApproved || !e.certApproved || !e.resumeApproved;
+                } else {
+                    return !e.idApproved || !e.ssnApproved || !e.certApproved;
+                }
+            });
+            
+            // Aprobados: Si tiene todos los documentos necesarios aprobados
+            const approvedEmployees = allEmployees.filter(e => {
+                const requiresResume = e.resumeDocumentPath ? true : false;
+                if (requiresResume) {
+                    return e.idApproved && e.ssnApproved && e.certApproved && e.resumeApproved;
+                } else {
+                    return e.idApproved && e.ssnApproved && e.certApproved;
+                }
+            });
+
+            // Actualizar tabla de pendientes
+            renderTable('Pending', pendingEmployees);
+            
+            // Actualizar tabla de aprobados
+            renderTable('Approved', approvedEmployees);
+
+            // Actualizar contadores
+            document.getElementById('pendingCount').textContent = pendingEmployees.length;
+            document.getElementById('approvedCount').textContent = approvedEmployees.length;
+        }
+
+        function renderTable(section, employees) {
+            const tableContainerId = `tableContainer${section}`;
+            const noDataContainerId = `noDataContainer${section}`;
+            const tableBodyId = `employeesTableBody${section}`;
+
+            const tableContainer = document.getElementById(tableContainerId);
+            const noDataContainer = document.getElementById(noDataContainerId);
+            const tableBody = document.getElementById(tableBodyId);
+
+            if (employees.length === 0) {
+                tableContainer.style.display = 'none';
+                noDataContainer.style.display = 'flex';
+                return;
+            }
+
+            tableContainer.style.display = 'block';
+            noDataContainer.style.display = 'none';
+            tableBody.innerHTML = employees.map(emp => createTableRows(emp)).join('');
+
+            // Re-attach event listeners
+            document.querySelectorAll(`#${tableBodyId} .expand-btn`).forEach(btn => {
+                btn.addEventListener('click', toggleExpand);
+            });
+        }
+
+        function createTableRows(emp) {
+            // Verificar si tiene CV
+            const hasResume = emp.resumeDocumentPath ? true : false;
+            
+            // Determinar si está completamente aprobado
+            const allApproved = hasResume 
+                ? emp.idApproved && emp.ssnApproved && emp.certApproved && emp.resumeApproved
+                : emp.idApproved && emp.ssnApproved && emp.certApproved;
+            
+            const approvalStatus = allApproved ? 'Completamente Aprobado' : 
+                                  (!emp.idApproved || !emp.ssnApproved || !emp.certApproved) ? 'Parcialmente Aprobado' : 'No Aprobado';
+            const statusClass = allApproved ? 'status-approved' : 'status-partial';
+
+            return `
+                <tr class="main-row" data-emp-id="${emp._id}">
+                    <td>
+                        <button class="expand-btn" title="Expandir">▼</button>
+                    </td>
+                    <td>
+                        <div class="employee-info">
+                            <div class="employee-name">${emp.firstName} ${emp.lastName}</div>
+                            <div class="employee-email">${emp.email}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="employee-info">
+                            <div>${emp.phone || 'N/A'}</div>
+                            <div class="employee-email">${emp.address || 'N/A'}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="status-badges">
+                            <span class="${emp.idApproved ? 'status-approved' : 'status-pending'} status-badge">ID ${emp.idApproved ? '✓' : '⏳'}</span>
+                            <span class="${emp.ssnApproved ? 'status-approved' : 'status-pending'} status-badge">SSN ${emp.ssnApproved ? '✓' : '⏳'}</span>
+                            <span class="${emp.certApproved ? 'status-approved' : 'status-pending'} status-badge">Cert ${emp.certApproved ? '✓' : '⏳'}</span>
+                            ${emp.resumeDocumentPath ? `<span class="${emp.resumeApproved ? 'status-approved' : 'status-pending'} status-badge">CV ${emp.resumeApproved ? '✓' : '⏳'}</span>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-cell">
+                            <button class="action-btn btn-approve-all" onclick="approveAll('${emp._id}')" ${allApproved ? 'disabled' : ''}>
+                                ${allApproved ? '✓ Todos' : 'Aprobar Todo'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="expanded-row" data-emp-id="${emp._id}">
+                    <td colspan="5">
+                        <div class="expanded-content">
+                            <div class="expanded-inner">
+                                <div class="section">
+                                    <div class="section-title">📋 Información</div>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Teléfono</div>
+                                            <div class="detail-value">${emp.phone || 'N/A'}</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Estado</div>
+                                            <div class="detail-value">${emp.state || 'N/A'}</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Dirección</div>
+                                            <div class="detail-value">${emp.address || 'N/A'}</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Desde</div>
+                                            <div class="detail-value">${emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : 'N/A'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section documents-section">
+                                    <div class="section-title">📄 Documentos</div>
+                                    <div class="documents-grid">
+                                        ${createDocumentCard('🪪 ID/Licencia', emp.profileImagePath, emp.idApproved, emp._id, 'id')}
+                                        ${createDocumentCard('🔢 SSN', emp.ssnDocumentPath, emp.ssnApproved, emp._id, 'ssn')}
+                                        ${createDocumentCard('📜 Certificación', emp.certDocumentPath, emp.certApproved, emp._id, 'cert')}
+                                        ${emp.resumeDocumentPath ? createDocumentCard('📄 CV', emp.resumeDocumentPath, emp.resumeApproved, emp._id, 'resume') : ''}
+                                    </div>
+
+                                    <div class="approval-actions">
+                                        <button class="action-btn btn-approve-all ${emp.idApproved ? 'approved' : 'pending'}" onclick="approveDocument('${emp._id}', 'id')" ${emp.idApproved ? 'disabled' : ''}>
+                                            ${emp.idApproved ? '✓ ID Aprobado' : 'Aprobar ID'}
+                                        </button>
+                                        <button class="action-btn btn-approve-all ${emp.ssnApproved ? 'approved' : 'pending'}" onclick="approveDocument('${emp._id}', 'ssn')" ${emp.ssnApproved ? 'disabled' : ''}>
+                                            ${emp.ssnApproved ? '✓ SSN Aprobado' : 'Aprobar SSN'}
+                                        </button>
+                                        <button class="action-btn btn-approve-all ${emp.certApproved ? 'approved' : 'pending'}" onclick="approveDocument('${emp._id}', 'cert')" ${emp.certApproved ? 'disabled' : ''}>
+                                            ${emp.certApproved ? '✓ Cert Aprobado' : 'Aprobar Cert'}
+                                        </button>
+                                        ${emp.resumeDocumentPath ? `<button class="action-btn btn-approve-all ${emp.resumeApproved ? 'approved' : 'pending'}" onclick="approveDocument('${emp._id}', 'resume')" ${emp.resumeApproved ? 'disabled' : ''}>
+                                            ${emp.resumeApproved ? '✓ CV Aprobado' : 'Aprobar CV'}
+                                        </button>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function createDocumentCard(label, path, isApproved, empId, docType) {
+            if (!path) {
+                return `<div class="document-card" style="opacity: 0.5;"><div class="doc-icon">❌</div><div class="doc-name">No disponible</div></div>`;
+            }
+
+            return `
+                <div class="document-card">
+                    <div class="doc-icon">${label.split(' ')[0]}</div>
+                    <div class="doc-name">${label.substring(label.indexOf(' ') + 1)}</div>
+                    <button class="doc-action ${isApproved ? 'doc-approved' : ''}" onclick="viewDocument('${path}', '${label}')">
+                        ${isApproved ? '✓ Aprobado' : 'Ver'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function toggleExpand(e) {
+            const btn = e.target;
+            const row = btn.closest('.main-row');
+            const empId = row.dataset.empId;
+            
+            if (expandedEmployeeId === empId) {
+                // Cerrar
+                row.classList.remove('expanded');
+                document.querySelector(`.expanded-row[data-emp-id="${empId}"]`).classList.remove('show');
+                btn.classList.remove('open');
+                expandedEmployeeId = null;
+            } else {
+                // Abrir nueva
+                if (expandedEmployeeId) {
+                    const prevRow = document.querySelector(`.main-row[data-emp-id="${expandedEmployeeId}"]`);
+                    if (prevRow) {
+                        prevRow.classList.remove('expanded');
+                        const prevExpandedRow = document.querySelector(`.expanded-row[data-emp-id="${expandedEmployeeId}"]`);
+                        if (prevExpandedRow) {
+                            prevExpandedRow.classList.remove('show');
+                        }
+                        const prevBtn = prevRow.querySelector('.expand-btn');
+                        if (prevBtn) {
+                            prevBtn.classList.remove('open');
+                        }
+                    }
+                }
+                
+                row.classList.add('expanded');
+                document.querySelector(`.expanded-row[data-emp-id="${empId}"]`).classList.add('show');
+                btn.classList.add('open');
+                expandedEmployeeId = empId;
+            }
+        }
+
+        function filterEmployees(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            
+            const pendingEmployees = allEmployees
+                .filter(e => {
+                    const hasResume = e.resumeDocumentPath ? true : false;
+                    if (hasResume) {
+                        return !e.idApproved || !e.ssnApproved || !e.certApproved || !e.resumeApproved;
+                    } else {
+                        return !e.idApproved || !e.ssnApproved || !e.certApproved;
+                    }
+                })
+                .filter(emp => {
+                    const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
+                    const email = emp.email.toLowerCase();
+                    return fullName.includes(term) || email.includes(term);
+                });
+
+            const approvedEmployees = allEmployees
+                .filter(e => {
+                    const hasResume = e.resumeDocumentPath ? true : false;
+                    if (hasResume) {
+                        return e.idApproved && e.ssnApproved && e.certApproved && e.resumeApproved;
+                    } else {
+                        return e.idApproved && e.ssnApproved && e.certApproved;
+                    }
+                })
+                .filter(emp => {
+                    const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
+                    const email = emp.email.toLowerCase();
+                    return fullName.includes(term) || email.includes(term);
+                });
+
+            // Actualizar tabla de pendientes
+            updateTableWithSearch('Pending', pendingEmployees);
+            
+            // Actualizar tabla de aprobados
+            updateTableWithSearch('Approved', approvedEmployees);
+        }
+
+        function updateTableWithSearch(section, employees) {
+            const tableContainerId = `tableContainer${section}`;
+            const noDataContainerId = `noDataContainer${section}`;
+            const tableBodyId = `employeesTableBody${section}`;
+            const countId = section === 'Pending' ? 'pendingCount' : 'approvedCount';
+
+            const tableContainer = document.getElementById(tableContainerId);
+            const noDataContainer = document.getElementById(noDataContainerId);
+            const tableBody = document.getElementById(tableBodyId);
+            const countElement = document.getElementById(countId);
+
+            if (employees.length === 0) {
+                tableContainer.style.display = 'none';
+                noDataContainer.style.display = 'flex';
+                return;
+            }
+
+            tableContainer.style.display = 'block';
+            noDataContainer.style.display = 'none';
+            tableBody.innerHTML = employees.map(emp => createTableRows(emp)).join('');
+            countElement.textContent = employees.length;
+
+            // Re-attach event listeners
+            document.querySelectorAll(`#${tableBodyId} .expand-btn`).forEach(btn => {
+                btn.addEventListener('click', toggleExpand);
+            });
+        }
+
+        function viewDocument(path, title) {
+            const modal = document.getElementById('documentModal');
+            const img = document.getElementById('modalDocumentImage');
+            const titleSpan = document.getElementById('modalDocumentTitle');
+
+            const fullPath = path.startsWith('http') ? path : `/uploads/${path}`;
+            img.src = fullPath;
+            titleSpan.textContent = title;
+            modal.classList.add('active');
+        }
+
+        function closeDocumentModal() {
+            document.getElementById('documentModal').classList.remove('active');
+        }
+
+        async function approveDocument(empId, docType) {
+            if (!confirm(`¿Confirmar aprobación de ${docType}?`)) return;
+
+            try {
+                const response = await fetch('/api/admin/approve-document', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ empId, docType })
+                });
+
+                if (!response.ok) throw new Error('Error al aprobar');
+
+                showNotification(`Documento ${docType} aprobado correctamente`, 'success');
+                loadEmployees();
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error al aprobar el documento', 'error');
+            }
+        }
+
+        async function approveAll(empId) {
+            if (!confirm('¿Confirmar aprobación de TODOS los documentos?')) return;
+
+            try {
+                const response = await fetch('/api/admin/approve-all', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ empId })
+                });
+
+                if (!response.ok) throw new Error('Error al aprobar');
+
+                showNotification('¡Todos los documentos han sido aprobados!', 'success');
+                loadEmployees();
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error al aprobar los documentos', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const div = document.createElement('div');
+            div.className = `notification ${type}`;
+            div.textContent = message;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        document.getElementById('documentModal').addEventListener('click', (e) => {
+            if (e.target.id === 'documentModal') closeDocumentModal();
+        });
+    </script>
+</body>
+</html>

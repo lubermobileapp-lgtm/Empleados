@@ -1,0 +1,1532 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+  --primary: #3498db;
+  --primary-dark: #2980b9;
+  --secondary: #2c3e50;
+  --light: #699aa772;
+  --dark: #34495e;
+  --success: #1db15a;
+  --radius: 8px;
+  --shadow: rgba(0, 0, 0, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  color: var(--dark);
+}
+
+body {
+  background: url('/images/background4.png') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* === HEADER CON FROST EFFECT + GRADIENT === */
+.profile-header {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(230, 244, 255, 0.8) 50%,
+    rgba(210, 235, 255, 0.8) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border-bottom: 2px solid var(--light);
+  box-shadow: 0 4px 12px var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.profile-header {
+  position: relative;
+}
+
+
+.profile-header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* === HEADER TOP === */
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.left-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* === AVATAR Y NOMBRE === */
+.name-and-avatar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.avatar-inline {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary);
+  box-shadow: 0 2px 8px var(--shadow);
+  padding: 4px;
+}
+
+.name-and-avatar h2 {
+  font-size: 2rem;
+  color: var(--dark);
+}
+
+/* === EARNINGS FUERA DEL MENÚ === */
+.earnings-visible {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+/* === MENÚ BURGER === */
+.burger-button {
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.burger-button:hover {
+  color: var(--primary-dark);
+}
+
+.burger-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.75rem;
+  display: none;
+  animation: badgePulse 2s infinite;
+}
+
+.burger-badge.active {
+  display: flex;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px rgba(231, 76, 60, 0);
+  }
+}
+
+/* === SITE LOGO (header) === */
+.right-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-logo {
+  width: 92px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 30;
+}
+
+/* === PANEL DE INFORMACIÓN OCULTO === */
+.user-details-panel {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+.user-details-panel.show {
+  display: flex;
+}
+
+.user-details-panel p {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* === BOTONES === */
+.download-buttons-centered {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.download-w2-button {
+  background-color: #ffffff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px var(--shadow);
+  position: relative;
+}
+
+.download-w2-button:hover {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.chat-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.7rem;
+  display: none;
+  animation: badgePulse 2s infinite;
+}
+
+.chat-badge.active {
+  display: flex;
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.profile-spacer {
+  flex: 1;
+  padding: 20px 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.schedules-container {
+  max-width: 100%;
+  width: 100%;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 15px;
+  box-shadow: 0 4px 12px var(--shadow);
+  text-align: center;
+}
+
+.schedules-container h3 {
+  margin-bottom: 15px;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+@media (min-width: 768px) {
+  .profile-spacer {
+    padding: 40px 20px;
+  }
+  
+  .schedules-container {
+    max-width: 800px;
+    padding: 20px;
+  }
+  
+  .schedules-container h3 {
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+  }
+}
+
+.schedule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.schedule-list li {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 244, 255, 0.8) 100%);
+  padding: 12px;
+  margin-bottom: 15px;
+  border-left: 5px solid var(--primary);
+  text-align: left;
+  border-radius: var(--radius);
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(52, 152, 219, 0.15);
+}
+
+.schedule-list li:hover {
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.15);
+  transform: translateY(-1px);
+}
+
+.schedule-list li.reserved {
+  border-left-color: var(--success);
+}
+
+.schedule-offer {
+  position: static;
+  background: var(--primary);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 6px;
+}
+
+@media (min-width: 768px) {
+  .schedule-list li {
+    padding: 15px;
+  }
+  
+  .schedule-offer {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    margin-bottom: 0;
+  }
+}
+
+.schedule-list li strong {
+  font-size: 1rem;
+  color: var(--dark);
+  margin-bottom: 4px;
+  display: block;
+  word-wrap: break-word;
+}
+
+.schedule-list li span {
+  font-size: 0.8rem;
+  color: var(--dark);
+  line-height: 1.4;
+  margin: 4px 0;
+  display: block;
+  word-wrap: break-word;
+}
+
+.schedule-list li > div {
+  font-size: 0.8rem;
+  margin: 4px 0;
+}
+
+@media (min-width: 768px) {
+  .schedule-list li strong {
+    font-size: 1.1rem;
+  }
+  
+  .schedule-list li span {
+    font-size: 0.9rem;
+  }
+  
+  .schedule-list li > div {
+    font-size: 0.9rem;
+  }
+}
+
+/* === VEHICLE TOGGLE & DETAILS - RACING STYLE === */
+.toggle-vehicles {
+  margin-top: 10px;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(41, 128, 185, 0.05) 100%);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.toggle-vehicles:hover {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.15) 0%, rgba(41, 128, 185, 0.1) 100%);
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+  transform: translateX(2px);
+}
+
+.toggle-vehicles img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0.8) sepia(0.2);
+}
+
+/* Vehicle details container with racing design */
+.vehicle-details {
+  display: none;
+  margin-top: 12px;
+  padding: 0;
+  font-size: 0.8rem;
+  animation: slideDown 0.3s ease;
+}
+
+.vehicle-details.show {
+  display: block;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+/* Individual vehicle card - Racing style */
+.vehicle-details > div {
+  background: linear-gradient(135deg, #f5f7fa 0%, #f0f4ff 100%);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+  transition: all 0.3s ease;
+}
+
+.vehicle-details > div:hover {
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
+  border-color: var(--primary-dark);
+}
+
+.vehicle-details > div::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+/* Vehicle image styling */
+.vehicle-details img {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.vehicle-details > div:hover img {
+  transform: scale(1.02);
+}
+
+/* Vehicle info grid */
+.vehicle-info-grid {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding-left: 8px;
+}
+
+.vehicle-info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.vehicle-info-item:last-child {
+  border-bottom: none;
+}
+
+.vehicle-info-item strong {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.vehicle-info-item span {
+  color: var(--dark);
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .toggle-vehicles {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  .toggle-vehicles img {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .vehicle-details > div {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .vehicle-details img {
+    grid-column: 1;
+    max-height: 180px;
+  }
+  
+  .vehicle-info-grid {
+    grid-column: 1;
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .toggle-vehicles {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+  
+  .vehicle-details > div {
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+    padding: 14px;
+  }
+  
+  .vehicle-details img {
+    max-width: 180px;
+    height: 120px;
+  }
+}
+
+.accept-button {
+  margin-top: 8px;
+  margin-right: 6px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #1db15a 0%, #17944f 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.8rem;
+  flex: 1;
+  min-width: 80px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(29, 177, 90, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.accept-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: left 0.5s ease;
+}
+
+.accept-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(29, 177, 90, 0.4);
+}
+
+.accept-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.accept-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.accept-button:disabled {
+  background: linear-gradient(135deg, #b0b0b0 0%, #808080 100%);
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+/* === DISPATCH STATUS BUTTON === */
+.dispatch-status-button {
+  margin-top: 0;
+  margin-right: 0;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.75rem;
+  min-width: auto;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  overflow: hidden;
+}
+
+.dispatch-status-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: left 0.4s ease;
+}
+
+.dispatch-status-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+.dispatch-status-button:hover::before {
+  left: 100%;
+}
+
+.dispatch-status-button:active {
+  transform: translateY(0);
+}
+
+.dispatch-status-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.dispatch-status-button:active {
+  transform: translateY(0);
+}
+
+/* Badge de información en el botón */
+.dispatch-status-button span {
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* === DISPATCH MODAL === */
+.dispatch-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+.dispatch-modal.show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dispatch-modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dispatch-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.dispatch-modal-header h2 {
+  color: #3498db;
+  font-size: 1.5em;
+  margin: 0;
+}
+
+.dispatch-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.dispatch-modal-close:hover {
+  color: #333;
+}
+
+.dispatch-status-item {
+  padding: 15px;
+  margin: 12px 0;
+  border-left: 4px solid #3498db;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.dispatch-status-item strong {
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.95em;
+}
+
+.dispatch-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.dispatch-status-badge.accepted {
+  background: #d4edda;
+  color: #155724;
+}
+
+.dispatch-status-badge.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.dispatch-status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.confirmation-img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.confirmation-img:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dispatch-modal-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #f0f0f0;
+  text-align: right;
+}
+
+.dispatch-modal-footer button {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.dispatch-modal-footer button:hover {
+  transform: translateY(-2px);
+}
+
+.schedule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+@media (min-width: 768px) {
+  .accept-button {
+    margin-top: 10px;
+    margin-right: 8px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    min-width: 100px;
+  }
+  
+  .dispatch-status-button {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .schedule-actions {
+    gap: 8px;
+    margin-top: 10px;
+  }
+}
+
+/* === FOOTER === */
+.profile-footer {
+  background: var(--secondary);
+  color: #fff;
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9rem;
+  box-shadow: 0 -2px 8px var(--shadow);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .profile-header-inner {
+    gap: 1rem;
+  }
+
+  .name-and-avatar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .avatar-inline {
+    width: 100px;
+    height: 100px;
+  }
+
+  .name-and-avatar h2 {
+    font-size: 1.5rem;
+  }
+
+  .download-w2-button {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  .burger-button {
+    align-self: center;
+  }
+
+  .left-header {
+    align-items: center;
+    text-align: center;
+  }
+
+  .site-logo {
+    width: 72px;
+    top: 12px;
+    right: 12px;
+  }
+}
+
+/* === EARNINGS HIGHLIGHT === */
+#earnings {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--success);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-weight: bold;
+  display: inline-block;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 1.1rem;
+}
+
+@keyframes earningsFlash {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(46, 204, 113, 0.7);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
+#earnings.flash {
+  animation: earningsFlash 0.6s ease;
+}
+
+/* === FILTROS === */
+.filter-form {
+  margin-bottom: 30px;
+  text-align: left;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--light);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--secondary);
+}
+
+.filter-select {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  background-color: #fff;
+  color: var(--dark);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.4);
+}
+
+.schedule-counters {
+  margin-bottom: 12px;
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #444;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.schedule-counters .counter {
+  background: #eef6ff;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #cce4ff;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 768px) {
+  .schedule-counters {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    justify-content: flex-start;
+  }
+  
+  .schedule-counters .counter {
+    padding: 6px 12px;
+  }
+}
+  border-radius: 6px;
+  border: 1px solid #cce4ff;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-counters .fleet {
+  color: #1e88e5;
+}
+
+.schedule-counters .customer {
+  color: #43a047;
+}
+
+/* === SCHEDULE DATE BADGE === */
+.schedule-date-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  width: fit-content;
+}
+
+/* TABLET */
+@media (min-width: 768px) {
+  .schedule-date-badge {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+    max-width: 210px;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+  }
+}
+
+/* DESKTOP - MÁS COMPACTO */
+@media (min-width: 1024px) {
+  .schedule-date-badge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+    max-width: 200px;
+  }
+}
+
+/* ========== ESTILOS PARA RUTA PLANNER ========== */
+.schedule-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+/* Modal de Planificador de Rutas */
+.route-planner-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  overflow-y: auto;
+}
+
+.route-planner-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.route-planner-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 95%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+}
+
+.route-planner-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.route-planner-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-route-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-route-modal:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.route-planner-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 25px;
+  min-height: 500px;
+}
+
+@media (max-width: 1024px) {
+  .route-planner-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.route-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-right: 1px solid #eee;
+  padding-right: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .route-list-section {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-right: 0;
+    padding-bottom: 20px;
+  }
+}
+
+.route-item-card {
+  background: #f8f9fa;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.route-item-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  background: #f0f4ff;
+}
+
+.route-item-card.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.route-item-card .stop-number {
+  background: #667eea;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.route-item-card .card-content {
+  padding-right: 35px;
+}
+
+.route-item-card .customer-name {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+.route-item-card .address {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.route-item-card .time-info {
+  color: #999;
+  font-size: 0.8rem;
+  display: flex;
+  gap: 10px;
+}
+
+.route-item-card .price {
+  color: #28a745;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.route-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#routeMap {
+  width: 100%;
+  height: 500px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #e5e5e5;
+}
+
+.route-summary {
+  background: #f0f4ff;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.route-summary h4 {
+  margin: 0 0 10px 0;
+  color: #667eea;
+  font-size: 0.95rem;
+}
+
+.route-summary p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.route-summary .total-price {
+  color: #28a745;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+.route-planner-footer {
+  display: flex;
+  gap: 10px;
+  padding: 20px 25px;
+  border-top: 1px solid #eee;
+  justify-content: flex-end;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+}
+
+.route-planner-footer button {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.route-planner-footer .btn-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.route-planner-footer .btn-cancel:hover {
+  background: #d0d0d0;
+}
+
+.route-planner-footer .btn-accept {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.route-planner-footer .btn-accept:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.route-planner-footer .btn-accept:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* ========== ESTILOS PARA TABS ========== */
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.tab-button:hover {
+  color: var(--primary);
+  background: rgba(52, 152, 219, 0.05);
+}
+
+.tab-button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab-badge {
+  background: #ff6b6b;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content h3 {
+  color: var(--dark);
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Marcar como completado visualmente */
+.schedule-list li.completed {
+  opacity: 0.85;
+  border-left: 4px solid #28a745;
+}
+
+/* ========== ENHANCED VEHICLE DETAILS RESPONSIVENESS ========== */
+
+/* Extra small devices (< 480px) */
+@media (max-width: 479px) {
+  .vehicle-details > div {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px;
+  }
+  
+  .vehicle-details img {
+    max-width: 100%;
+    height: auto;
+    max-height: 150px;
+  }
+  
+  .vehicle-info-grid {
+    grid-column: 1;
+    padding-left: 0;
+  }
+  
+  .vehicle-info-item {
+    padding: 4px 0;
+  }
+  
+  .vehicle-info-item strong {
+    font-size: 0.65rem;
+  }
+  
+  .vehicle-info-item span {
+    font-size: 0.75rem;
+  }
+  
+  .toggle-vehicles {
+    font-size: 0.75rem;
+    padding: 6px 8px;
+  }
+}
+
+/* Small devices (480px - 768px) */
+@media (min-width: 480px) and (max-width: 768px) {
+  .vehicle-details > div {
+    grid-template-columns: 150px 1fr;
+    gap: 10px;
+    padding: 11px;
+  }
+  
+  .vehicle-details img {
+    max-width: 100%;
+    height: 100px;
+    object-fit: cover;
+  }
+  
+  .vehicle-info-grid {
+    grid-column: 2;
+  }
+  
+  .vehicle-info-item strong {
+    font-size: 0.7rem;
+  }
+  
+  .vehicle-info-item span {
+    font-size: 0.8rem;
+  }
+}
+
+/* Medium devices (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .vehicle-details > div {
+    grid-template-columns: 180px 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .vehicle-details img {
+    max-width: 100%;
+    height: 110px;
+    object-fit: cover;
+  }
+  
+  .vehicle-info-item strong {
+    font-size: 0.75rem;
+  }
+  
+  .vehicle-info-item span {
+    font-size: 0.85rem;
+  }
+}
+
+/* Large devices (> 1024px) */
+@media (min-width: 1025px) {
+  .vehicle-details > div {
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+    padding: 14px;
+  }
+  
+  .vehicle-details img {
+    max-width: 100%;
+    height: 120px;
+    object-fit: cover;
+  }
+  
+  .vehicle-info-item strong {
+    font-size: 0.75rem;
+  }
+  
+  .vehicle-info-item span {
+    font-size: 0.85rem;
+  }
+}

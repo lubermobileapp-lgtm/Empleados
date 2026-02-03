@@ -1,0 +1,139 @@
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --light: #f4f4f4;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --font-main: 'Segoe UI', sans-serif;
+  }
+  
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    background-color: var(--light);
+  }
+  
+  header {
+    background-color: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    text-align: center;
+  }
+  
+  .container {
+    display: flex;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+  }
+  
+  .sidebar {
+    width: 300px;
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  
+  .sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 1rem;
+    color: var(--primary);
+  }
+  
+  .user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .user-list li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .user-list li:hover {
+    background-color: #f0f8ff;
+  }
+  
+  .user-list li.active {
+    background-color: #d6ecff;
+    font-weight: bold;
+  }
+  
+  .chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+  }
+  
+  .chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    font-size: 14px;
+    background-color: #fdfdfd;
+  }
+  
+  .chat-messages .message {
+    margin-bottom: 15px;
+  }
+  
+  .chat-messages .message strong {
+    color: var(--primary);
+  }
+  
+  .chat-messages img {
+    max-width: 200px;
+    border-radius: 6px;
+    margin-top: 5px;
+  }
+  
+  .chat-form {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #fafafa;
+  }
+  
+  .chat-form input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .chat-form label {
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  
+  .chat-form input[type="file"] {
+    display: none;
+  }
+  
+  .chat-form button {
+    background-color: var(--secondary);
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    margin-left: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .chat-form button:hover {
+    background-color: #217dbb;
+  }
+  
+  footer {
+    text-align: center;
+    padding: 10px;
+    background: var(--primary);
+    color: white;
+  }
+  

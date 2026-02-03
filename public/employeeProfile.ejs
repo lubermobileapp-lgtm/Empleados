@@ -1,0 +1,3201 @@
+<!-- ✅ THIS FILE ALREADY INCLUDES ALL THE LOGIC TO BLOCK OFFERS AT THE SAME DAY AND TIME -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile of <%= emp.firstName %> - Luber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/employeeProfile.css">
+  <style>
+    /* Modern Schedule Card Styles */
+    :root {
+      --card-primary: #667eea;
+      --card-primary-dark: #5568d3;
+      --card-primary-light: #f0f4ff;
+      --card-secondary: #764ba2;
+      --card-success: #1db15a;
+      --card-success-dark: #17944f;
+      --card-text-primary: #0f1419;
+      --card-text-secondary: #3a3f47;
+      --card-text-tertiary: #6b7280;
+      --card-text-quaternary: #9ca3af;
+      --card-border-light: #e5e7eb;
+      --card-border-medium: #d1d5db;
+      --card-bg-light: #f9fafb;
+      --card-bg-lighter: #f3f4f6;
+      --card-bg-white: #ffffff;
+      --card-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+      --card-shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+      --card-shadow-lg: 0 12px 32px 0 rgba(0, 0, 0, 0.15);
+      --card-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .schedule-card {
+      background: var(--card-bg-white);
+      border-radius: 1.5rem;
+      overflow: visible;
+      box-shadow: var(--card-shadow-md);
+      transition: var(--card-transition);
+      border: 1px solid var(--card-border-light);
+      margin-bottom: 1.75rem;
+      position: relative;
+    }
+
+    .schedule-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--card-primary) 0%, var(--card-secondary) 100%);
+      border-radius: 1.5rem 1.5rem 0 0;
+    }
+
+    .schedule-card:hover {
+      box-shadow: var(--card-shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .schedule-card.expanded .schedule-card-header {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.04) 100%);
+    }
+
+    .schedule-card-header {
+      background: linear-gradient(135deg, var(--card-primary-light) 0%, rgba(118, 75, 162, 0.03) 100%);
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      user-select: none;
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr auto 2rem;
+      gap: 6rem;
+      align-items: center;
+      transition: var(--card-transition);
+      border-bottom: 1px solid var(--card-border-light);
+      pointer-events: auto;
+    }
+
+    .schedule-card-vehicle,
+    .schedule-card-engine,
+    .schedule-card-price,
+    .schedule-card-address {
+      display: none !important;
+    }
+
+    @media (max-width: 1400px) {
+      .schedule-card-header {
+        grid-template-columns: auto 1fr auto 1fr auto 2rem;
+        gap: 3rem;
+        padding: 0.5rem 0.8rem;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .schedule-card-header {
+        grid-template-columns: auto 1fr auto 1fr auto 2rem;
+        gap: 2.5rem;
+        padding: 0.5rem 0.8rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .schedule-card {
+        margin-bottom: 0.6rem;
+        overflow: hidden;
+      }
+      .schedule-card-header {
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        grid-template-columns: auto 1fr auto 1fr auto;
+        gap: 1.5rem;
+        padding: 0.3rem 0.4rem;
+        align-items: flex-start;
+        min-width: max-content;
+      }
+      .schedule-card-date {
+        min-width: 50px;
+        gap: 0.1rem;
+        flex-shrink: 0;
+      }
+      .schedule-card-date-badge {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.5rem;
+        white-space: nowrap;
+      }
+      .schedule-card-date-label {
+        font-size: 0.35rem;
+        white-space: nowrap;
+      }
+      .schedule-card-time {
+        min-width: 40px;
+        gap: 0.1rem;
+        flex-shrink: 0;
+      }
+      .schedule-card-time-display {
+        font-size: 0.55rem;
+        color: var(--card-secondary);
+        white-space: nowrap;
+      }
+      .schedule-card-time-label {
+        font-size: 0.35rem;
+        white-space: nowrap;
+      }
+      .schedule-card-customer {
+        gap: 0.1rem;
+        flex-shrink: 0;
+      }
+      .schedule-card-customer-name {
+        font-size: 0.72rem;   /* antes era grande */
+        font-weight: 700;
+        color: var(--card-text-primary);
+      }
+
+      .schedule-card-customer-type {
+        font-size: 0.42rem;
+      }
+
+      .schedule-card-customer-type {
+        font-size: 0.35rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .schedule-card-expanded-mini {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.2rem;
+        margin-top: 0.2rem;
+        font-size: 0.42rem;
+        min-width: 85px;
+        flex-shrink: 0;
+      }
+      .schedule-card-mini-item {
+        padding: 0.2rem 0.2rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 0.2rem;
+        border: 0.5px solid rgba(102, 126, 234, 0.1);
+        min-width: 35px;
+      }
+      .schedule-card-mini-label {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15px;
+        color: #999;
+        font-size: 0.33rem;
+        white-space: nowrap;
+      }
+      .schedule-card-mini-value {
+        font-weight: 600;
+        color: var(--card-primary);
+        font-size: 0.42rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .schedule-card {
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+      }
+      .schedule-card-header {
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        grid-template-columns: auto 1fr auto 1fr auto;
+        gap: 0.8rem;
+        padding: 0.25rem 0.35rem;
+        align-items: flex-start;
+        min-width: max-content;
+      }
+      .schedule-card-header::-webkit-scrollbar {
+        height: 2px;
+      }
+      .schedule-card-header::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+      }
+      .schedule-card-header::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 2px;
+      }
+      .schedule-card-date {
+        min-width: 45px;
+        gap: 0.1rem;
+        flex-shrink: 0;
+      }
+
+      .schedule-card-date-badge {
+        padding: 0.25rem 0.45rem;
+        font-size: 0.55rem;
+      }
+
+      .schedule-card-date-label {
+        font-size: 0.4rem;
+      }
+
+      .schedule-card-date-label {
+        font-size: 0.3rem;
+        white-space: nowrap;
+      }
+      .schedule-card-time {
+        min-width: 35px;
+        gap: 0.08rem;
+        flex-shrink: 0;
+      }
+    .schedule-card-time-display {
+      font-size: 0.55rem;
+    }
+
+    .schedule-card-time-label {
+      font-size: 0.4rem;
+    }
+
+      .schedule-card-customer {
+        gap: 0.08rem;
+        flex-shrink: 0;
+      }
+      .schedule-card-customer-name {
+        font-size: 0.6rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .schedule-card-customer-type {
+        font-size: 0.3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .schedule-card-expanded-mini {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.15rem;
+        margin-top: 0.1rem;
+        font-size: 0.38rem;
+        min-width: 75px;
+        flex-shrink: 0;
+      }
+      .schedule-card-mini-item {
+        padding: 0.15rem 0.15rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 0.15rem;
+        border: 0.5px solid rgba(102, 126, 234, 0.1);
+        min-width: 32px;
+      }
+      .schedule-card-mini-label {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1px;
+        color: #999;
+        font-size: 0.3rem;
+        white-space: nowrap;
+      }
+      .schedule-card-mini-value {
+        font-weight: 600;
+        color: var(--card-primary);
+        font-size: 0.38rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .schedule-card-expand-icon {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .schedule-card-expand-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--card-primary);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .schedule-card.expanded .schedule-card-expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .schedule-card-date {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 95px;
+    }
+
+    .schedule-card-date-badge {
+      background: linear-gradient(135deg, var(--card-primary) 0%, var(--card-secondary) 100%);
+      color: white;
+      padding: 0.35rem 0.7rem;
+      border-radius: 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .schedule-card-date-label {
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-time {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 75px;
+      flex-shrink: 0;
+    }
+
+    .schedule-card-time-display {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--card-secondary);
+    }
+
+    .schedule-card-time-label {
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-customer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      flex-shrink: 0;
+    }
+
+    .schedule-card-customer-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--card-text-primary);
+    }
+
+    .schedule-card-customer-type {
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-vehicle {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-width: 140px;
+    }
+
+    .schedule-card-vehicle-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--card-text-primary);
+    }
+
+    .schedule-card-vehicle-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-price {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-width: 110px;
+      text-align: right;
+    }
+
+    .schedule-card-price-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--card-success);
+    }
+
+    .schedule-card-price-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-engine {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-width: 105px;
+    }
+
+    .schedule-card-engine-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--card-text-primary);
+    }
+
+    .schedule-card-engine-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--card-text-quaternary);
+    }
+
+    /* Mini expansion info for mobile */
+    .schedule-card-expanded-mini {
+      display: none;
+    }
+
+    .schedule-card-mini-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .schedule-card-mini-label {
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #999;
+    }
+
+    .schedule-card-mini-value {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--card-primary);
+    }
+
+    .schedule-card-address {
+      display: none;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-width: 220px;
+      padding-left: 1.5rem;
+      border-left: 2px solid var(--card-border-light);
+    }
+
+    .schedule-card-address-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--card-primary);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1.35;
+    }
+
+    .schedule-card-address-text:hover {
+      color: var(--card-primary-dark);
+      text-decoration: underline;
+    }
+
+    .schedule-card-address-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-content {
+      display: none;
+      padding: 1.5rem 1.75rem;
+      background: var(--card-bg-white);
+      border-top: 1px solid var(--card-border-light);
+    }
+
+    .schedule-card.expanded .schedule-card-content {
+      display: grid;
+      animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      position: relative;
+      padding: 1.5rem 1.75rem;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .schedule-card.expanded .schedule-card-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.70) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1400px) {
+      .schedule-card.expanded .schedule-card-content {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+      .schedule-card-vehicle-image-section {
+        min-width: auto;
+      }
+      .schedule-card-vehicle-image {
+        max-width: 350px;
+        margin: 0 auto;
+      }
+    }
+
+    .schedule-card-vehicle-image-section {
+      display: none;
+    }
+
+    .schedule-card-vehicle-image {
+      display: none;
+    }
+
+    .schedule-card-vehicle-image img {
+      display: none;
+    }
+
+    .schedule-card-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .schedule-card-details-left,
+    .schedule-card-details-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .schedule-card-specs {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      padding: 1.25rem;
+      border-radius: 1.125rem;
+      border: 1px solid rgba(102, 126, 234, 0.15);
+      backdrop-filter: blur(10px);
+    }
+    }
+
+    .schedule-card-specs-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--card-primary);
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--card-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .schedule-card-specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
+
+    .schedule-card-spec-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.60);
+      padding: 0.875rem;
+      border-radius: 0.875rem;
+      border: 1px solid rgba(102, 126, 234, 0.05);
+      transition: var(--card-transition);
+      backdrop-filter: blur(8px);
+    }
+
+    .schedule-card-spec-item:hover {
+      background: rgba(240, 244, 255, 0.75);
+      border-color: var(--card-primary);
+      box-shadow: var(--card-shadow-xs);
+    }
+
+    .schedule-card-spec-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-spec-value {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--card-primary);
+      letter-spacing: -0.2px;
+    }
+
+    .schedule-card-filter-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.5rem 0.875rem;
+      border-radius: 0.625rem;
+      background: rgba(249, 250, 251, 0.65);
+      border: 1px solid rgba(102, 126, 234, 0);
+      width: fit-content;
+      backdrop-filter: blur(6px);
+    }
+      font-weight: 600;
+    }
+
+    .schedule-card-filter-status.needed {
+      color: #dc2626;
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.2);
+    }
+
+    .schedule-card-filter-status.good {
+      color: var(--card-success);
+      background: rgba(29, 177, 90, 0.08);
+      border-color: rgba(29, 177, 90, 0.2);
+    }
+
+    .schedule-card-status-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .schedule-card-status-indicator.needed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .schedule-card-status-indicator.good {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .schedule-card-info-blocks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .schedule-card-info-block {
+      background: rgba(255, 255, 255, 0.65);
+      padding: 0.75rem;
+      border-radius: 1rem;
+      border: 1px solid var(--card-border-light);
+      border-left: 3px solid var(--card-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      transition: var(--card-transition);
+      box-shadow: var(--card-shadow-xs);
+      backdrop-filter: blur(8px);
+    }
+
+    .schedule-card-info-block:hover {
+      box-shadow: var(--card-shadow-sm);
+      transform: translateY(-2px);
+    }
+
+    .schedule-card-info-block.price {
+      grid-column: 1;
+      padding: 1.25rem;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0) 0%, rgba(118, 75, 162, 0) 100%);
+      border: 2px solid var(--card-primary);
+      border-left: 4px solid var(--card-primary);
+      backdrop-filter: blur(10px);
+    }
+
+    .schedule-card-info-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--card-text-quaternary);
+    }
+
+    .schedule-card-info-block.price .schedule-card-info-label {
+      color: var(--card-primary);
+    }
+
+    .schedule-card-info-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--card-text-primary);
+      line-height: 1.45;
+    }
+
+    .schedule-card-info-block.location .schedule-card-info-value {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--card-primary);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .schedule-card-info-block.price .schedule-card-info-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--card-primary);
+      letter-spacing: -0.4px;
+    }
+
+    .schedule-card-info-block.price .schedule-card-info-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--card-success);
+      letter-spacing: -0.3px;
+    }
+
+    .schedule-card-action-buttons {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      grid-column: 1 / -1;
+      position: relative;
+      z-index: 10;
+    }
+
+    .schedule-card-btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 0.875rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--card-transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .schedule-card-btn-success {
+      background: linear-gradient(135deg, var(--card-success) 0%, var(--card-success-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(29, 177, 90, 0.25);
+    }
+
+    .schedule-card-btn-success:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(29, 177, 90, 0.35);
+    }
+
+    .schedule-card-btn-success:active {
+      transform: translateY(-1px);
+    }
+
+    .schedule-card-btn-primary {
+      background: linear-gradient(135deg, var(--card-primary) 0%, var(--card-secondary) 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+    }
+
+    .schedule-card-btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+    }
+
+    .schedule-card-btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 1024px) {
+      .schedule-card-details {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .schedule-card-specs-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+      .schedule-card-info-blocks {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+      .schedule-card-content {
+        padding: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .schedule-card.expanded .schedule-card-content {
+        padding: 0.7rem 0.6rem;
+        gap: 0.6rem;
+      }
+      .schedule-card-vehicle-image {
+        width: 100%;
+        max-width: 240px;
+        margin: 0 auto;
+      }
+      .schedule-card-details-left,
+      .schedule-card-details-right {
+        gap: 0.6rem;
+      }
+      .schedule-card-specs {
+        padding: 0.6rem;
+        gap: 0.5rem;
+      }
+      .schedule-card-specs-title {
+        font-size: 0.55rem;
+        padding-bottom: 0.3rem;
+      }
+      .schedule-card-specs-grid {
+        gap: 0.5rem;
+      }
+      .schedule-card-spec-item {
+        padding: 0.5rem;
+        gap: 0.25rem;
+      }
+      .schedule-card-spec-label {
+        font-size: 0.45rem;
+      }
+      .schedule-card-spec-value {
+        font-size: 0.75rem;
+      }
+      .schedule-card-info-blocks {
+        gap: 0.5rem;
+      }
+      .schedule-card-info-block {
+        padding: 0.6rem;
+      }
+      .schedule-card-info-block.price {
+        padding: 0.6rem;
+      }
+      .schedule-card-info-label {
+        font-size: 0.5rem;
+      }
+      .schedule-card-info-value {
+        font-size: 0.75rem;
+      }
+      .schedule-card-info-block.price .schedule-card-info-value {
+        font-size: 1rem;
+      }
+      .schedule-card-action-buttons {
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+        flex-direction: column;
+      }
+      .schedule-card-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+        width: 100%;
+      }
+      .schedule-card-filter-status {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.5rem;
+      }
+      .schedule-card-status-indicator {
+        width: 12px;
+        height: 12px;
+        font-size: 0.45rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .schedule-card.expanded .schedule-card-content {
+        padding: 0.5rem 0.5rem;
+        gap: 0.5rem;
+      }
+      .schedule-card-specs {
+        padding: 0.5rem;
+        gap: 0.3rem;
+      }
+      .schedule-card-specs-title {
+        font-size: 0.5rem;
+        padding-bottom: 0.25rem;
+      }
+      .schedule-card-specs-grid {
+        gap: 0.4rem;
+      }
+      .schedule-card-spec-item {
+        padding: 0.4rem;
+        gap: 0.15rem;
+      }
+      .schedule-card-spec-label {
+        font-size: 0.4rem;
+      }
+      .schedule-card-spec-value {
+        font-size: 0.65rem;
+      }
+      .schedule-card-info-blocks {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+      .schedule-card-info-block {
+        padding: 0.5rem;
+      }
+      .schedule-card-info-block.location,
+      .schedule-card-info-block.price {
+        grid-column: 1;
+        padding: 0.5rem;
+      }
+      .schedule-card-info-label {
+        font-size: 0.5rem;
+      }
+      .schedule-card-info-value {
+        font-size: 0.75rem;
+      }
+      .schedule-card-info-block.price .schedule-card-info-value {
+        font-size: 1rem;
+      }
+      .schedule-card-action-buttons {
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+      }
+      .schedule-card-btn {
+        width: 100%;
+        min-width: auto;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+      }
+      .schedule-card-filter-status {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.6rem;
+      }
+      .schedule-card-status-indicator {
+        width: 12px;
+        height: 12px;
+        font-size: 0.4rem;
+      }
+      .schedule-card-details-left,
+      .schedule-card-details-right {
+        gap: 0.6rem;
+      }
+    }
+
+    /* 📍 MAP MODAL STYLES */
+    .map-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .map-modal-content {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 90%;
+      max-height: 85vh;
+      overflow: auto;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .map-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .map-modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .map-modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .map-modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .map-modal-body {
+      padding: 20px;
+    }
+
+    .distance-info {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .distance-info p {
+      margin: 8px 0;
+      font-size: 1rem;
+      color: #3a3f47;
+    }
+
+    .distance-info strong {
+      color: #667eea;
+    }
+
+    .map-modal-footer {
+      display: flex;
+      gap: 10px;
+      padding: 20px;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 0 0 12px 12px;
+      justify-content: flex-end;
+    }
+
+    .map-modal-footer .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      flex: 1;
+      max-width: 150px;
+      text-align: center;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #3a3f47;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 600px) {
+      .map-modal-content {
+        width: 95%;
+        max-height: 90vh;
+      }
+
+      .map-modal-header {
+        padding: 15px;
+      }
+
+      .map-modal-header h2 {
+        font-size: 1.2rem;
+      }
+
+      .map-modal-body {
+        padding: 15px;
+      }
+
+      .map-modal-footer {
+        flex-direction: column;
+        padding: 15px;
+      }
+
+      .map-modal-footer .btn {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-page">
+    <header class="profile-header">
+      <div class="header-overlay"></div>
+      <div class="profile-header-inner">
+        <div class="header-top">
+          <div class="left-header">
+            <div class="name-and-avatar">
+              <img src="<%= emp.profileImagePath %>" class="avatar-inline" alt="Avatar of <%= emp.firstName %>">
+              <h2><%= emp.firstName %> <%= emp.lastName %></h2>
+            </div>
+            <div class="earnings-visible">
+              <strong>Total Earned:</strong>
+              <span id="earnings" class="earnings">
+                $<%= emp.totalEarnings?.toFixed(2) || '0.00' %>
+              </span>
+            </div>
+          </div>
+          <div class="right-header">
+            <img src="/images/logo.png" class="site-logo" alt="Luber logo">
+          </div>
+          <button class="burger-button" id="toggleInfoBtn" aria-label="Menu">
+            ☰
+            <span class="burger-badge" id="unreadBadge">0</span>
+          </button>
+        </div>
+    
+        <div class="user-details-panel" id="userDetailsPanel">
+          <p><strong>Email:</strong> <%= emp.email %></p>
+          <p><strong>Phone:</strong> <%= emp.phone %></p>
+          <p><strong>Date of Birth:</strong>
+            <%= emp.dob ? new Date(emp.dob).toLocaleDateString('es-ES') : 'Not registered' %>
+          </p>
+          <p><strong>Social Security (Last 4):</strong>
+            <%= emp.ssn && emp.ssn.length >= 4 ? '***-**-' + emp.ssn.slice(-4) : 'Not registered' %>
+          </p>
+    
+          <div class="download-buttons-centered">
+            <button type="button" class="download-w2-button" id="chatButton" onclick="openChat()">
+              💬 Chat con Admin
+              <span class="chat-badge" id="chatBadge">0</span>
+            </button>
+
+            <form action="/download-w2" method="POST" target="_blank">
+              <input type="hidden" name="employeeId" value="<%= emp._id %>">
+              <button type="submit" class="download-w2-button">📄 Download 1099 Form</button>
+            </form>
+    
+            <% if (emp.totalEarnings >= 600) { %>
+              <form action="/download-1099" method="POST" target="_blank">
+                <input type="hidden" name="employeeId" value="<%= emp._id %>">
+                <button type="submit" class="download-w2-button">📁 Download 1099-NEC</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </header>    
+
+    <div class="profile-spacer">
+      <div class="schedules-container">
+        <!-- TABS NAVIGATION -->
+        <div class="tabs-container">
+          <button class="tab-button active" onclick="switchTab('incoming')">
+            📥 Incoming Schedule
+            <span class="tab-badge" id="incomingBadge">0</span>
+          </button>
+          <button class="tab-button" onclick="switchTab('accepted')">
+            ✅ My Work Schedules
+            <span class="tab-badge" id="acceptedBadge">0</span>
+          </button>
+          <button class="tab-button" onclick="switchTab('completed')">
+            🎉 Completed
+            <span class="tab-badge" id="completedBadge">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: INCOMING SCHEDULE -->
+        <div id="tab-incoming" class="tab-content active">
+          <h3>📥 Incoming Schedule - Available Offers</h3>
+
+          <% 
+            const incoming = schedules.filter(sch => !sch.Completed && !sch.reserved);
+            const fleetCount = incoming.filter(sch => sch.accountType === 'Fleet').length;
+            const customerCount = incoming.filter(sch => sch.accountType === 'Customer').length;
+          %>
+
+          <div class="schedule-counters">
+            <span class="counter fleet">🚚 Fleet: <strong><%= fleetCount %></strong></span>
+            <span class="counter customer">👤 Customer: <strong><%= customerCount %></strong></span>
+          </div>
+
+          <form method="get" action="/profile" class="filter-form">
+            <label for="accountType" class="filter-label">Filter by account type:</label>
+            <select name="accountType" id="accountType" class="filter-select" onchange="this.form.submit()">
+              <option value="">-- All --</option>
+              <option value="Fleet" <%= selectedAccountType === 'Fleet' ? 'selected' : '' %>>Fleet</option>
+              <option value="Customer" <%= selectedAccountType === 'Customer' ? 'selected' : '' %>>Customer</option>
+            </select>
+          </form>
+
+          <!-- SECCIÓN DE PLANIFICACIÓN DE RUTAS -->
+          <div style="margin: 20px 0; padding: 15px; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="margin-bottom: 10px; color: #667eea;">🗺️ Plan Your Route</h4>
+            <p style="margin-bottom: 10px; font-size: 0.9rem; color: #666;">
+              Select multiple offers and view them on Google Maps before accepting them all at once!
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="accept-button" onclick="openRoutePlanner()" style="background: #667eea; color: white;">
+                📍 Route Planner
+              </button>
+              <button class="accept-button" onclick="acceptRouteLater()" style="background: #28a745; color: white;">
+                ✅ Accept Route
+              </button>
+              <button class="accept-button" onclick="clearRouteSelection()" style="background: #dc3545; color: white;">
+                🗑️ Clear Selection
+              </button>
+              <span id="selectionCounter" style="display: inline-flex; align-items: center; padding: 0 10px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                0 selected
+              </span>
+            </div>
+          </div>
+
+          <% if (!incoming.length) { %>
+            <p style="text-align: center; color: #999; padding: 40px 20px;">No available offers at this moment.</p>
+          <% } else { %>
+            <div style="display: flex; flex-direction: column; gap: 0;">
+              <% incoming.forEach((schedule, i) => {
+                const vehicle = schedule.vehicles?.[0];
+                const vehicleName = vehicle?.vehicleInfo?.brand && vehicle?.vehicleInfo?.model 
+                  ? `${vehicle.vehicleInfo.brand} ${vehicle.vehicleInfo.model}` 
+                  : 'Vehicle';
+                const engine = vehicle?.vehicleInfo?.engine || 'N/A';
+              %>
+                <div class="schedule-card" id="card-<%= schedule._id %>">
+                  <!-- COLLAPSED VIEW -->
+                  <div class="schedule-card-header" onclick="toggleScheduleCard('<%= schedule._id %>')">
+                    <!-- Customer -->
+                    <div class="schedule-card-customer">
+                      <div class="schedule-card-customer-name"><%= schedule.customerName %></div>
+                      <div class="schedule-card-customer-type"><%= schedule.accountType || 'Account' %></div>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="schedule-card-date">
+                      <div class="schedule-card-date-badge"><%= schedule.date %></div>
+                      <div class="schedule-card-date-label">Date</div>
+                    </div>
+
+                    <!-- Time -->
+                    <div class="schedule-card-time">
+                      <div class="schedule-card-time-display"><%= schedule.time %></div>
+                      <div class="schedule-card-time-label">Time</div>
+                    </div>
+
+                    <!-- Vehicle -->
+                    <div class="schedule-card-vehicle">
+                      <div class="schedule-card-vehicle-name"><%= vehicleName %></div>
+                      <div class="schedule-card-vehicle-label">Vehicle</div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="schedule-card-price">
+                      <div class="schedule-card-price-value">$<%= schedule.offerPrice ? schedule.offerPrice.toFixed(2) : '0.00' %></div>
+                      <div class="schedule-card-price-label">Price</div>
+                    </div>
+
+                    <!-- Engine -->
+                    <div class="schedule-card-engine">
+                      <div class="schedule-card-engine-value"><%= engine %></div>
+                      <div class="schedule-card-engine-label">Engine</div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="schedule-card-address">
+                      <div class="schedule-card-address-label">Location</div>
+                      <a class="schedule-card-address-text" href="https://www.google.com/maps/search/<%= encodeURIComponent(schedule.clientAddress) %>" target="_blank">
+                        <%= schedule.clientAddress %>
+                      </a>
+                    </div>
+
+                    <!-- Expand Icon -->
+                    <svg class="schedule-card-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                  </div>
+
+                  <!-- EXPANDED VIEW -->
+                  <div class="schedule-card-content">
+                    <!-- Vehicle Image -->
+                    <div class="schedule-card-vehicle-image-section">
+                      <div class="schedule-card-vehicle-image">
+                        <% if (vehicle?.vehicleInfo?.vehicleImageUrl) { %>
+                          <img src="<%= vehicle.vehicleInfo.vehicleImageUrl %>" alt="<%= vehicleName %>">
+                        <% } else { %>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 130px; height: 130px; color: #d1d5db;">
+                            <rect x="3" y="5" width="18" height="12" rx="2"></rect>
+                            <circle cx="7" cy="17" r="2"></circle>
+                            <circle cx="17" cy="17" r="2"></circle>
+                            <path d="M3 7h18"></path>
+                          </svg>
+                        <% } %>
+                      </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="schedule-card-details">
+                      <!-- Left Column -->
+                      <div class="schedule-card-details-left">
+                        <!-- Specifications -->
+                        <div class="schedule-card-specs">
+                          <div class="schedule-card-specs-title">Specifications</div>
+                          <div class="schedule-card-specs-grid">
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Brand</div>
+                              <div class="schedule-card-spec-value"><%= vehicle?.vehicleInfo?.brand || 'N/A' %></div>
+                            </div>
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Model</div>
+                              <div class="schedule-card-spec-value"><%= vehicle?.vehicleInfo?.model || 'N/A' %></div>
+                            </div>
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Oil Type</div>
+                              <div class="schedule-card-spec-value"><%= vehicle?.oilType || 'N/A' %></div>
+                            </div>
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Engine</div>
+                              <div class="schedule-card-spec-value"><%= engine %></div>
+                            </div>
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Year</div>
+                              <div class="schedule-card-spec-value"><%= vehicle?.vehicleInfo?.year || 'N/A' %></div>
+                            </div>
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Plate (Last 3)</div>
+                              <div class="schedule-card-spec-value" style="font-family: monospace; letter-spacing: 1px;"><%= vehicle?.vehicleInfo?.plateLast3 || '---' %></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Right Column -->
+                      <div class="schedule-card-details-right">
+                        <!-- Maintenance Status -->
+                        <div class="schedule-card-specs">
+                          <div class="schedule-card-specs-title">Maintenance</div>
+                          <div class="schedule-card-specs-grid">
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Air Filter</div>
+                              <div class="schedule-card-filter-status <%= vehicle?.airFilter ? 'good' : 'needed' %>">
+                                <span class="schedule-card-status-indicator <%= vehicle?.airFilter ? 'good' : 'needed' %>"><%= vehicle?.airFilter ? '✓' : '✕' %></span>
+                                <%= vehicle?.airFilter ? 'Good' : 'Needed' %>
+                              </div>
+                            </div>
+                            <div class="schedule-card-spec-item">
+                              <div class="schedule-card-spec-label">Cabin Filter</div>
+                              <div class="schedule-card-filter-status <%= vehicle?.cabinFilter ? 'good' : 'needed' %>">
+                                <span class="schedule-card-status-indicator <%= vehicle?.cabinFilter ? 'good' : 'needed' %>"><%= vehicle?.cabinFilter ? '✓' : '✕' %></span>
+                                <%= vehicle?.cabinFilter ? 'Good' : 'Needed' %>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Service Info -->
+                        <div class="schedule-card-info-blocks">
+                          <div class="schedule-card-info-block price">
+                            <div class="schedule-card-info-label">💰 Price</div>
+                            <div class="schedule-card-info-value">$<%= schedule.offerPrice ? schedule.offerPrice.toFixed(2) : '0.00' %></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="schedule-card-action-buttons">
+                      <button class="schedule-card-btn schedule-card-btn-success" onclick="acceptOffer('<%= schedule._id %>', this)">
+                        ✓ Accept Offer
+                      </button>
+                      <button class="schedule-card-btn schedule-card-btn-primary" onclick="openDispatchModalFromButton(this)" 
+                              data-schedule-id="<%= schedule._id %>"
+                              data-dispatch-accepted="<%= schedule.DispatchAccepted %>"
+                              data-dispatch-ready="<%= schedule.DispatchReady %>"
+                              data-confirmation-number="<%= schedule.PurchaseConfirmationNumber || '' %>"
+                              data-images='<%= JSON.stringify(schedule.PurchaseConfirmationIMG || []) %>'>
+                        📊 Dispatch Status
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- TAB 2: MY WORK SCHEDULES -->
+        <div id="tab-accepted" class="tab-content">
+          <h3>✅ My Work Schedules - Accepted Offers</h3>
+
+          <% 
+            const accepted = schedules.filter(sch => !sch.Completed && sch.reserved && sch.acceptedBy?.toString() === emp._id.toString());
+          %>
+
+          <% if (accepted.length > 0) { %>
+            <div style="text-align:right; margin-bottom: 15px;">
+              <% const routesAccepted = accepted.map(sch => encodeURIComponent(sch.clientAddress)).join('/'); %>
+              <a href="https://www.google.com/maps/dir/<%= routesAccepted %>" target="_blank" style="color: var(--primary); font-weight: bold;">
+                🗺️ View all routes on Google Maps
+              </a>
+            </div>
+          <% } %>
+
+          <% if (!accepted.length) { %>
+            <p style="text-align: center; color: #999; padding: 40px 20px;">You haven't accepted any offers yet. Check the "Incoming Schedule" tab!</p>
+          <% } else { %>
+            <ul class="schedule-list">
+              <% accepted.forEach((schedule, i) => { %>
+                <li class="reserved" data-schedule-id="<%= schedule._id %>" data-address="<%= schedule.clientAddress %>" data-client-lat="<%= schedule.clientLatitude || '' %>" data-client-lon="<%= schedule.clientLongitude || '' %>">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                      <div class="schedule-date-badge">
+                        📅 <%= schedule.date %> @ <%= schedule.time %>
+                      </div>
+                    </div>
+                    <% if (schedule.offerPrice > 0) { %>
+                      <div class="schedule-offer">Offer: $<%= schedule.offerPrice.toFixed(2) %></div>
+                    <% } %>
+                  </div>
+                  
+                  <div style="display: flex; justify-content: center; margin: 6px 0; gap: 0;">
+                    <% 
+                      const hasImages = schedule.PurchaseConfirmationIMG && schedule.PurchaseConfirmationIMG.length > 0;
+                      const hasNumber = schedule.PurchaseConfirmationNumber && schedule.PurchaseConfirmationNumber.toString().trim() !== '';
+                      const infoCount = (hasImages ? 1 : 0) + (hasNumber ? 1 : 0);
+                    %>
+                    <button class="dispatch-status-button" 
+                            data-schedule-id="<%= schedule._id %>"
+                            data-dispatch-accepted="<%= schedule.DispatchAccepted %>"
+                            data-dispatch-ready="<%= schedule.DispatchReady %>"
+                            data-confirmation-number="<%= schedule.PurchaseConfirmationNumber || '' %>"
+                            data-images='<%= JSON.stringify(schedule.PurchaseConfirmationIMG || []) %>'
+                            onclick="openDispatchModalFromButton(this)" 
+                            title="Ver estado de dispatch" 
+                            style="padding: 5px 10px; font-size: 0.75rem; position: relative;">
+                      📊 Dispatch Status
+                      <% if (infoCount > 0) { %>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; border: 2px solid white;">
+                          ℹ️
+                        </span>
+                      <% } %>
+                    </button>
+                  </div>
+                  
+                  <strong style="display: block; margin-bottom: 2px;"><%= schedule.customerName %></strong>
+                  <a href="https://www.google.com/maps/search/<%= encodeURIComponent(schedule.clientAddress) %>" 
+                     target="_blank" 
+                     style="display: block; margin-bottom: 4px; color: var(--primary); text-decoration: underline; font-weight: 500; cursor: pointer;">
+                    📍 <%= schedule.clientAddress %>
+                  </a>
+                  <% if (schedule.accountType) { %>
+                    <div style="margin-bottom: 4px;"><strong>Account type:</strong> <%= schedule.accountType %></div>
+                  <% } %>
+                  <% if (schedule.vehicles?.length) { %>
+                    <div class="toggle-vehicles" onclick="toggleVehicle(<%= i %>)">
+                      <img src="/images/20-06-11-Electric-car-icon-set-svg-7-512.webp" alt="Vehicle">
+                      <span>🏎️ View vehicle(s) Details</span>
+                    </div>
+                    <div class="vehicle-details" id="vehicle-<%= i %>">
+                      <% schedule.vehicles.forEach((v, vIdx) => { %>
+                        <div>
+                          <% if (v.vehicleInfo?.vehicleImageUrl) { %>
+                            <img src="<%= v.vehicleInfo.vehicleImageUrl %>" alt="<%= v.vehicleInfo?.brand %> <%= v.vehicleInfo?.model %>">
+                          <% } else { %>
+                            <div style="background: #e0e0e0; border-radius: 6px; display: flex; align-items: center; justify-content: center; min-height: 120px; color: #999;">No Image</div>
+                          <% } %>
+                          <div class="vehicle-info-grid">
+                            <div class="vehicle-info-item">
+                              <strong>Vehicle</strong>
+                              <span><% if (v.vehicleInfo?.brand) { %><%= v.vehicleInfo.brand %> <%= v.vehicleInfo.model %> <% if (v.vehicleInfo?.year) { %>(<%= v.vehicleInfo.year %>) <% } %><% } else { %>--<% } %></span>
+                            </div>
+                            <div class="vehicle-info-item">
+                              <strong>Price</strong>
+                              <span style="color: var(--success); font-weight: 700;">$<%= v.price %></span>
+                            </div>
+                            <div class="vehicle-info-item">
+                              <strong>Oil Type</strong>
+                              <span><%= v.oilType %></span>
+                            </div>
+                            <% if (v.vehicleInfo?.engine) { %>
+                            <div class="vehicle-info-item">
+                              <strong>Engine</strong>
+                              <span><%= v.vehicleInfo.engine %></span>
+                            </div>
+                            <% } %>
+                            <div class="vehicle-info-item">
+                              <strong>Filters</strong>
+                              <span>Air: <%= v.airFilter ? '✅' : '❌' %> | Cabin: <%= v.cabinFilter ? '✅' : '❌' %></span>
+                            </div>
+                            <% if (v.vehicleInfo?.plateLast3) { %>
+                            <div class="vehicle-info-item">
+                              <strong>Plate</strong>
+                              <span style="font-family: monospace; letter-spacing: 2px; font-weight: 700;">*-*-<%= v.vehicleInfo.plateLast3 %></span>
+                            </div>
+                            <% } %>
+                            <div class="vehicle-info-item" style="border-bottom: none; padding-bottom: 0;">
+                              <strong>Service Location</strong>
+                              <span><%= v.serviceAddress %></span>
+                            </div>
+                          </div>
+                        </div>
+                      <% }) %>
+                    </div>
+                  <% } %>
+                  <div class="schedule-actions">
+                    <!-- 🗺️ Botón de Mapa en Tiempo Real -->
+                    <% if (schedule.OnRoad && !schedule.Completed) { %>
+                      <button 
+                        class="accept-button map-button"
+                        onclick="openRealtimeMapModal('<%= schedule._id %>', '<%= schedule.customerName %>', '<%= schedule.clientAddress %>', '<%= schedule.clientLatitude || '' %>', '<%= schedule.clientLongitude || '' %>', '<%= schedule.employeeLocation?.latitude || '' %>', '<%= schedule.employeeLocation?.longitude || '' %>', '<%= schedule.employeeLocation?.accuracy || '' %>')"
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        🗺️ Ver Mapa en Vivo
+                      </button>
+                    <% } %>
+                    
+                    <% const steps = ['OnRoad', 'Arrived', 'Started', 'Completed']; %>
+                    <% steps.forEach((step, idx) => {
+                         const isDone = schedule[step];
+                         const prevDone = steps.slice(0, idx).every(s => schedule[s]);
+                         const disabled = isDone || !prevDone;
+                    %>
+                      <button
+                        class="accept-button"
+                        data-id="<%= schedule._id %>"
+                        data-step="<%= step %>"
+                        onclick="updateStatus('<%= schedule._id %>', '<%= step %>', this)"
+                        <%= disabled ? 'disabled' : '' %>>
+                        <%= isDone ? '✅ ' + step : step %>
+                      </button>
+                    <% }) %>
+                  </div>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+
+        <!-- TAB 3: COMPLETED -->
+        <div id="tab-completed" class="tab-content">
+          <h3>🎉 Completed - All Done!</h3>
+
+          <% 
+            const completed = schedules.filter(sch => sch.Completed && sch.acceptedBy?.toString() === emp._id.toString());
+          %>
+
+          <% if (!completed.length) { %>
+            <p style="text-align: center; color: #999; padding: 40px 20px;">You haven't completed any schedules yet. Complete offers from "My Work Schedules" to see them here!</p>
+          <% } else { %>
+            <ul class="schedule-list">
+              <% completed.forEach((schedule, i) => { %>
+                <li class="reserved completed" data-schedule-id="<%= schedule._id %>" data-address="<%= schedule.clientAddress %>">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                      <div class="schedule-date-badge">
+                        📅 <%= schedule.date %> @ <%= schedule.time %>
+                      </div>
+                      <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">✅ COMPLETED</span>
+                    </div>
+                    <% if (schedule.offerPrice > 0) { %>
+                      <div class="schedule-offer">Earned: $<%= schedule.offerPrice.toFixed(2) %></div>
+                    <% } %>
+                  </div>
+                  
+                  <div style="display: flex; justify-content: center; margin: 6px 0; gap: 0;">
+                    <% 
+                      const hasImages = schedule.PurchaseConfirmationIMG && schedule.PurchaseConfirmationIMG.length > 0;
+                      const hasNumber = schedule.PurchaseConfirmationNumber && schedule.PurchaseConfirmationNumber.toString().trim() !== '';
+                      const infoCount = (hasImages ? 1 : 0) + (hasNumber ? 1 : 0);
+                    %>
+                    <button class="dispatch-status-button" 
+                            data-schedule-id="<%= schedule._id %>"
+                            data-dispatch-accepted="<%= schedule.DispatchAccepted %>"
+                            data-dispatch-ready="<%= schedule.DispatchReady %>"
+                            data-confirmation-number="<%= schedule.PurchaseConfirmationNumber || '' %>"
+                            data-images='<%= JSON.stringify(schedule.PurchaseConfirmationIMG || []) %>'
+                            onclick="openDispatchModalFromButton(this)" 
+                            title="Ver estado de dispatch" 
+                            style="padding: 5px 10px; font-size: 0.75rem; position: relative;">
+                      📊 Dispatch Status
+                      <% if (infoCount > 0) { %>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; border: 2px solid white;">
+                          ℹ️
+                        </span>
+                      <% } %>
+                    </button>
+                  </div>
+                  
+                  <strong style="display: block; margin-bottom: 2px;"><%= schedule.customerName %></strong>
+                  <a href="https://www.google.com/maps/search/<%= encodeURIComponent(schedule.clientAddress) %>" 
+                     target="_blank" 
+                     style="display: block; margin-bottom: 4px; color: var(--primary); text-decoration: underline; font-weight: 500; cursor: pointer;">
+                    📍 <%= schedule.clientAddress %>
+                  </a>
+                  <% if (schedule.accountType) { %>
+                    <div style="margin-bottom: 4px;"><strong>Account type:</strong> <%= schedule.accountType %></div>
+                  <% } %>
+                  <% if (schedule.serviceMilage != null) { %>
+                    <div style="margin-bottom: 4px;"><strong>Service mileage:</strong> <%= schedule.serviceMilage %> km</div>
+                  <% } %>
+                  <% if (schedule.vehicles?.length) { %>
+                    <div class="toggle-vehicles" onclick="toggleVehicle(<%= i %>)">
+                      <img src="/images/20-06-11-Electric-car-icon-set-svg-7-512.webp" alt="Vehicle">
+                      <span>🏎️ View vehicle(s) Details</span>
+                    </div>
+                    <div class="vehicle-details" id="vehicle-<%= i %>">
+                      <% schedule.vehicles.forEach((v, vIdx) => { %>
+                        <div>
+                          <% if (v.vehicleInfo?.vehicleImageUrl) { %>
+                            <img src="<%= v.vehicleInfo.vehicleImageUrl %>" alt="<%= v.vehicleInfo?.brand %> <%= v.vehicleInfo?.model %>">
+                          <% } else { %>
+                            <div style="background: #e0e0e0; border-radius: 6px; display: flex; align-items: center; justify-content: center; min-height: 120px; color: #999;">No Image</div>
+                          <% } %>
+                          <div class="vehicle-info-grid">
+                            <div class="vehicle-info-item">
+                              <strong>Vehicle</strong>
+                              <span><% if (v.vehicleInfo?.brand) { %><%= v.vehicleInfo.brand %> <%= v.vehicleInfo.model %> <% if (v.vehicleInfo?.year) { %>(<%= v.vehicleInfo.year %>) <% } %><% } else { %>--<% } %></span>
+                            </div>
+                            <div class="vehicle-info-item">
+                              <strong>Price</strong>
+                              <span style="color: var(--success); font-weight: 700;">$<%= v.price %></span>
+                            </div>
+                            <div class="vehicle-info-item">
+                              <strong>Oil Type</strong>
+                              <span><%= v.oilType %></span>
+                            </div>
+                            <% if (v.vehicleInfo?.engine) { %>
+                            <div class="vehicle-info-item">
+                              <strong>Engine</strong>
+                              <span><%= v.vehicleInfo.engine %></span>
+                            </div>
+                            <% } %>
+                            <div class="vehicle-info-item">
+                              <strong>Filters</strong>
+                              <span>Air: <%= v.airFilter ? '✅' : '❌' %> | Cabin: <%= v.cabinFilter ? '✅' : '❌' %></span>
+                            </div>
+                            <% if (v.vehicleInfo?.plateLast3) { %>
+                            <div class="vehicle-info-item">
+                              <strong>Plate</strong>
+                              <span style="font-family: monospace; letter-spacing: 2px; font-weight: 700;">*-*-<%= v.vehicleInfo.plateLast3 %></span>
+                            </div>
+                            <% } %>
+                            <div class="vehicle-info-item" style="border-bottom: none; padding-bottom: 0;">
+                              <strong>Service Location</strong>
+                              <span><%= v.serviceAddress %></span>
+                            </div>
+                          </div>
+                        </div>
+                      <% }) %>
+                    </div>
+                  <% } %>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dispatch Status Modal -->
+    <div id="dispatchModal" class="dispatch-modal">
+      <div class="dispatch-modal-content">
+        <div class="dispatch-modal-header">
+          <h2>📊 Dispatch Status</h2>
+          <button class="dispatch-modal-close" onclick="closeDispatchModal()">✕</button>
+        </div>
+        <div id="dispatchStatusContent"></div>
+        <div class="dispatch-modal-footer">
+          <button onclick="closeDispatchModal()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="profile-footer">&copy; 2025 Luber</footer>
+  </div>
+  <script>
+    let employeeId = '<%= emp._id %>';
+    let selectedSchedules = [];
+
+    // ========== SISTEMA DE TABS ==========
+    function switchTab(tabName) {
+      // Ocultar todos los tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Desactivar todos los botones
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Mostrar tab seleccionado y activar botón
+      const tabElement = document.getElementById('tab-' + tabName);
+      if (tabElement) {
+        tabElement.classList.add('active');
+      }
+      
+      // Activar el botón correspondiente
+      const buttons = document.querySelectorAll('.tab-button');
+      buttons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(`switchTab('${tabName}')`)) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Guardar preferencia en localStorage
+      localStorage.setItem('activeTab', tabName);
+    }
+
+    // Cargar tab guardado o mostrar primer tab por defecto
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTab = localStorage.getItem('activeTab') || 'incoming';
+      const tabBtn = document.querySelector(`button[onclick="switchTab('${savedTab}')"]`);
+      if (tabBtn) {
+        tabBtn.click();
+      }
+    });
+
+    // ========== ACTUALIZAR CONTADORES DE TABS ==========
+    function updateTabCounters() {
+      // Count schedule cards in each tab
+      const incoming = document.querySelectorAll('#tab-incoming .schedule-card').length;
+      const accepted = document.querySelectorAll('#tab-accepted .schedule-card').length;
+      const completed = document.querySelectorAll('#tab-completed .schedule-card').length;
+      
+      document.getElementById('incomingBadge').textContent = incoming;
+      document.getElementById('acceptedBadge').textContent = accepted;
+      document.getElementById('completedBadge').textContent = completed;
+      
+      console.log(`Contadores actualizados: Incoming=${incoming}, Accepted=${accepted}, Completed=${completed}`);
+    }
+
+    // Llamar a updateTabCounters cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', updateTabCounters);
+    
+    // Actualizar contadores cada 2 segundos para mantener sincronizado
+    setInterval(updateTabCounters, 2000);
+
+    // ========== SOPORTE PARA PLANIFICADOR DE RUTAS ==========
+    function updateSelectionCounter() {
+      const checkboxes = document.querySelectorAll('.schedule-checkbox:checked');
+      const counter = document.getElementById('selectionCounter');
+      counter.textContent = checkboxes.length + ' selected';
+    }
+
+    function clearRouteSelection() {
+      document.querySelectorAll('.schedule-checkbox').forEach(cb => cb.checked = false);
+      selectedSchedules = [];
+      updateSelectionCounter();
+    }
+
+    function openRoutePlanner() {
+      const checkboxes = document.querySelectorAll('.schedule-checkbox:checked');
+      
+      if (checkboxes.length === 0) {
+        alert('❌ Por favor selecciona al menos una oferta');
+        return;
+      }
+
+      if (checkboxes.length === 1) {
+        alert('⚠️ Selecciona al menos 2 ofertas para crear una ruta');
+        return;
+      }
+
+      selectedSchedules = Array.from(checkboxes).map(cb => {
+        const liElement = document.querySelector(`li[data-schedule-id="${cb.dataset.scheduleId}"]`);
+        const priceMatch = liElement?.textContent.match(/Offer: \$([0-9.]+)/);
+        const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+        const customerName = liElement?.querySelector('strong')?.textContent || 'Cliente';
+
+        return {
+          id: cb.dataset.scheduleId,
+          address: cb.dataset.address,
+          date: cb.dataset.date,
+          time: cb.dataset.time,
+          offer: price,
+          customerName: customerName
+        };
+      });
+
+      // Construir URL de Google Maps con la ruta
+      const addresses = selectedSchedules.map(s => s.address);
+      const googleMapsUrl = `https://www.google.com/maps/dir/${addresses.map(addr => encodeURIComponent(addr)).join('/')}`;
+      
+      console.log('🗺️ Abriendo Google Maps con ruta:', googleMapsUrl);
+      
+      // Abrir en nueva ventana
+      window.open(googleMapsUrl, 'routePlanner', 'width=1200,height=800');
+    }
+
+    function closeRoutePlannerModal() {
+      const modal = document.getElementById('routePlannerModal');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function acceptRouteLater() {
+      if (selectedSchedules.length === 0) {
+        alert('❌ No hay paradas seleccionadas');
+        return;
+      }
+      
+      // Mostrar diálogo de confirmación
+      const total = selectedSchedules.reduce((sum, s) => sum + s.offer, 0);
+      const confirmMsg = `✅ ¿Aceptar ruta con ${selectedSchedules.length} paradas?
+      
+Ganancias totales: $${total.toFixed(2)}
+
+¿Continuar?`;
+      
+      if (confirm(confirmMsg)) {
+        acceptMultipleOffers();
+      }
+    }
+
+    // Escuchar mensaje de la ventana del route-map (aunque no la usemos ya)
+    window.addEventListener('message', async (event) => {
+      if (event.data.action === 'acceptRoute') {
+        const schedules = event.data.schedules;
+        await acceptMultipleOffers(schedules);
+        closeRoutePlannerModal();
+      }
+    });
+
+    async function acceptMultipleOffers(schedules) {
+      // Si se reciben schedules como parámetro (desde iframe), usar esos
+      if (schedules && schedules.length > 0) {
+        selectedSchedules = schedules;
+      }
+
+      if (selectedSchedules.length === 0) {
+        alert('❌ No offers selected');
+        return;
+      }
+
+      try {
+        const response = await fetch('/accept-multiple-offers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            scheduleIds: selectedSchedules.map(s => s.id)
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('✅ ¡Ruta aceptada! Los ' + selectedSchedules.length + ' servicios están ahora reservados.');
+          clearRouteSelection();
+          setTimeout(() => location.reload(), 500);
+        } else {
+          alert('❌ ' + (data.error || 'Error al aceptar los servicios'));
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('❌ Error de red o servidor');
+      }
+    }
+
+    // ========== SOPORTE PARA ACTUALIZACIONES DE STATUS ==========
+    // Status updates: El cliente consultará con botón refresh en el perfil
+    
+    // Earnings updates: El cliente consultará con botón refresh en el perfil
+
+    // ========== SISTEMA DE CONTADOR DE MENSAJES SIN LEER ==========
+    let unreadMessageCount = localStorage.getItem(`unreadMessages_${employeeId}`) ? parseInt(localStorage.getItem(`unreadMessages_${employeeId}`)) : 0;
+    const unreadBadge = document.getElementById('unreadBadge');
+    const chatBadge = document.getElementById('chatBadge');
+
+    function updateUnreadBadge() {
+      if (unreadMessageCount > 0) {
+        const displayCount = unreadMessageCount > 9 ? '9+' : unreadMessageCount;
+        unreadBadge.textContent = displayCount;
+        unreadBadge.classList.add('active');
+        
+        // También actualizar badge del botón de chat
+        chatBadge.textContent = displayCount;
+        chatBadge.classList.add('active');
+      } else {
+        unreadBadge.classList.remove('active');
+        chatBadge.classList.remove('active');
+      }
+      localStorage.setItem(`unreadMessages_${employeeId}`, unreadMessageCount);
+    }
+
+    // Inicializar badge
+    updateUnreadBadge();
+
+    // Socket.IO eliminado - El cliente consultará datos con botones de refresh
+
+    function toggleVehicle(i) {
+      const el = document.getElementById('vehicle-' + i);
+      el.classList.toggle('show');
+    }
+
+    // Toggle modern schedule card expanded/collapsed
+    function toggleScheduleCard(cardId) {
+      console.log('Toggle called with ID:', cardId);
+      const card = document.getElementById('card-' + cardId);
+      console.log('Card found:', card);
+      if (!card) {
+        console.log('Card not found!');
+        return;
+      }
+      
+      const isExpanding = !card.classList.contains('expanded');
+      card.classList.toggle('expanded');
+      console.log('Expanded:', card.classList.contains('expanded'));
+      
+      // Set background image when expanding
+      if (isExpanding) {
+        const img = card.querySelector('.schedule-card-vehicle-image img');
+        const cardContent = card.querySelector('.schedule-card-content');
+        if (img && img.src && cardContent) {
+          cardContent.style.backgroundImage = `url('${img.src}')`;
+          console.log('Background image set');
+        }
+      } else {
+        const cardContent = card.querySelector('.schedule-card-content');
+        if (cardContent) {
+          cardContent.style.backgroundImage = 'none';
+          console.log('Background image removed');
+        }
+      }
+    }
+
+    // Initialize background images on page load for expanded cards
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.schedule-card.expanded').forEach(card => {
+        const img = card.querySelector('.schedule-card-vehicle-image img');
+        if (img && img.src) {
+          const cardContent = card.querySelector('.schedule-card-content');
+          cardContent.style.backgroundImage = `url('${img.src}')`;
+        }
+      });
+    });
+
+    // Función para abrir el chat del empleado
+    function openChat() {
+      window.open('/employeeChat.html', 'employeeChat', 'width=600,height=700,resizable=yes,scrollbars=yes');
+    }
+
+    async function acceptOffer(scheduleId, btn) {
+      btn.disabled = true;
+      try {
+        console.log('Aceptando orden e iniciando rastreo de ubicación');
+        
+        // Get current location and accept the offer
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const location = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                altitude: position.coords.altitude,
+                method: 'GPS'
+              };
+              
+              console.log('📍 Ubicación obtenida al aceptar:', location);
+              
+              // Send acceptance with initial location
+              sendAcceptance(scheduleId, location, btn);
+            },
+            (error) => {
+              console.warn('⚠️ No se pudo obtener ubicación al aceptar, continuando sin ella:', error.message);
+              // Continue without location
+              sendAcceptance(scheduleId, null, btn);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            }
+          );
+        } else {
+          console.error('Geolocalización no disponible');
+          sendAcceptance(scheduleId, null, btn);
+        }
+        
+        async function sendAcceptance(scheduleId, location, btn) {
+          try {
+            const res = await fetch('/accept-offer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ scheduleId, location })
+            });
+            
+            const data = await res.json();
+            console.log('Respuesta del servidor:', data);
+            
+            if (data.success) {
+              alert('✅ Orden aceptada.\n\n📍 Se pedirá acceso a tu ubicación GPS para comenzar el rastreo automático cada minuto.\n\nPor favor, haz clic en "Permitir" cuando el navegador lo solicite.');
+              
+              // 🚀 Start location tracking immediately after acceptance
+              startLocationTracking(scheduleId);
+              
+              // Switch to "My Work Schedule" tab automatically
+              switchTab('accepted');
+              
+              // Refresh page after 1 second to load the accepted order
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } else {
+              alert('Error: ' + (data.error || 'Error desconocido'));
+              btn.disabled = false;
+            }
+          } catch (err) {
+            console.error('Error al aceptar orden:', err);
+            alert('Error al aceptar la orden: ' + err.message);
+            btn.disabled = false;
+          }
+        }
+      } catch (err) {
+        console.error('Error al aceptar orden:', err);
+        alert('Error al aceptar la orden: ' + err.message);
+        btn.disabled = false;
+      }
+    }
+
+    // 🕐 Location Tracking System with localStorage persistence
+    const locationTracking = {};
+
+    // Load active tracking sessions from localStorage on page load
+    function initializeLocationTracking() {
+      const activeTrackingSessions = JSON.parse(localStorage.getItem('activeTrackingSessions') || '[]');
+      console.log(`📍 Inicializando rastreo. Sesiones activas:`, activeTrackingSessions);
+      
+      activeTrackingSessions.forEach(scheduleId => {
+        console.log(`🔄 [${scheduleId}] Reanudando rastreo desde sesión anterior`);
+        startLocationTracking(scheduleId);
+      });
+    }
+
+    // 🕐 Start location tracking every minute
+    function startLocationTracking(scheduleId) {
+      // Prevent duplicate tracking for same schedule
+      if (locationTracking[scheduleId]) {
+        console.log(`📍 [${scheduleId}] Ya se está rastreando - Cancelando rastreo anterior`);
+        clearInterval(locationTracking[scheduleId]);
+      }
+
+      console.log(`🚀 [${scheduleId}] Iniciando rastreo de ubicación cada minuto`);
+      
+      // Get location immediately
+      updateEmployeeLocation(scheduleId);
+      
+      // Then get location every 60 seconds (1 minute)
+      const intervalId = setInterval(() => {
+        console.log(`⏰ [${scheduleId}] Buscando ubicación (Cada minuto)...`);
+        updateEmployeeLocation(scheduleId);
+      }, 60000); // 60,000 milliseconds = 1 minute
+
+      // Store the interval ID
+      locationTracking[scheduleId] = intervalId;
+      
+      // Save this schedule to active sessions in localStorage
+      const activeTrackingSessions = JSON.parse(localStorage.getItem('activeTrackingSessions') || '[]');
+      if (!activeTrackingSessions.includes(scheduleId)) {
+        activeTrackingSessions.push(scheduleId);
+        localStorage.setItem('activeTrackingSessions', JSON.stringify(activeTrackingSessions));
+      }
+      
+      console.log(`✅ [${scheduleId}] Rastreo iniciado - ID del intervalo: ${intervalId}`);
+    }
+
+    // 🛑 Stop location tracking when employee arrives
+    function stopLocationTracking(scheduleId) {
+      console.log(`🛑 [${scheduleId}] Deteniendo rastreo de ubicación...`);
+      
+      if (locationTracking[scheduleId]) {
+        clearInterval(locationTracking[scheduleId]);
+        delete locationTracking[scheduleId];
+      }
+      
+      // Remove from active sessions in localStorage
+      const activeTrackingSessions = JSON.parse(localStorage.getItem('activeTrackingSessions') || '[]');
+      const filteredSessions = activeTrackingSessions.filter(id => id !== scheduleId);
+      localStorage.setItem('activeTrackingSessions', JSON.stringify(filteredSessions));
+      
+      console.log(`✅ [${scheduleId}] Rastreo detenido correctamente`);
+    }
+
+    // 📍 Update employee location with MAXIMUM ACCURACY
+    function updateEmployeeLocation(scheduleId) {
+      if (!navigator.geolocation) {
+        console.error(`❌ [${scheduleId}] Geolocalización no disponible en este navegador`);
+        alert('⚠️ La geolocalización no está disponible en tu navegador');
+        return;
+      }
+
+      // Check permission status first (if available)
+      if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then(result => {
+          if (result.state === 'denied') {
+            console.error(`❌ [${scheduleId}] Permiso de geolocalización denegado`);
+            alert('❌ Permiso de geolocalización denegado.\n\nVa a necesitar habilitar el permiso en la configuración del navegador para que funcione el rastreo.');
+            return;
+          } else if (result.state === 'granted') {
+            console.log(`✅ [${scheduleId}] Permiso de geolocalización ya concedido`);
+            requestLocationWithPermission(scheduleId);
+          } else {
+            // prompt state - will be asked when getCurrentPosition is called
+            console.log(`⏳ [${scheduleId}] Se pedirá permiso de geolocalización`);
+            requestLocationWithPermission(scheduleId);
+          }
+        });
+      } else {
+        // Fallback for browsers that don't support permissions API
+        requestLocationWithPermission(scheduleId);
+      }
+    }
+
+    function requestLocationWithPermission(scheduleId) {
+      // Attempt 1: High accuracy GPS with shorter timeout
+      let attemptsLeft = 2;
+      const locations = [];
+
+      function attemptHighAccuracyLocation() {
+        navigator.geolocation.getCurrentPosition(
+          // Success callback
+          (position) => {
+            const rawLocation = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              altitude: position.coords.altitude,
+              altitudeAccuracy: position.coords.altitudeAccuracy,
+              heading: position.coords.heading,
+              speed: position.coords.speed,
+              timestamp: position.timestamp,
+              isHighAccuracy: true
+            };
+
+            locations.push(rawLocation);
+            console.log(`✅ [${scheduleId}] GPS PRECISO (Intento ${4 - attemptsLeft}):`, {
+              lat: rawLocation.latitude.toFixed(7),
+              lon: rawLocation.longitude.toFixed(7),
+              accuracy: rawLocation.accuracy.toFixed(2) + 'm',
+              altitude: rawLocation.altitude ? rawLocation.altitude.toFixed(2) + 'm' : 'No disponible',
+              speed: rawLocation.speed ? (rawLocation.speed * 3.6).toFixed(1) + ' km/h' : 'Estacionario'
+            });
+
+            // Continue collecting more samples for averaging
+            if (attemptsLeft > 1) {
+              attemptsLeft--;
+              setTimeout(() => attemptHighAccuracyLocation(), 500); // Wait 0.5 seconds between attempts
+            } else {
+              // All samples collected - average them for maximum accuracy
+              finalizeBestLocation(scheduleId, locations);
+            }
+          },
+          // Error callback
+          (error) => {
+            let errorMsg = '';
+            let showAlert = false;
+            
+            if (error.code === error.PERMISSION_DENIED) {
+              errorMsg = '❌ PERMISO DENEGADO: El navegador no tiene permiso para acceder a tu ubicación.\n\nPor favor, habilita el permiso en la configuración del navegador y recarga la página.';
+              showAlert = true;
+              attemptsLeft = 0; // Don't retry if permission denied
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+              errorMsg = '⚠️ Posición no disponible - Intenta en un lugar con mejor señal GPS';
+            } else if (error.code === error.TIMEOUT) {
+              errorMsg = '⏱️ Timeout en GPS - Reintentando...';
+            } else {
+              errorMsg = '❌ Error de geolocalización: ' + error.message;
+            }
+            
+            console.warn(`⚠️  [${scheduleId}] ${errorMsg}`);
+            
+            if (showAlert) {
+              alert(errorMsg);
+            }
+
+            if (attemptsLeft > 1) {
+              attemptsLeft--;
+              console.log(`🔄 [${scheduleId}] Reintentando (${attemptsLeft} intentos restantes)...`);
+              setTimeout(() => attemptHighAccuracyLocation(), 1000);
+            } else if (locations.length > 0) {
+              finalizeBestLocation(scheduleId, locations);
+            } else {
+              // Fallback to IP-based geolocation
+              console.log(`📡 [${scheduleId}] Intentando geolocalización por IP...`);
+              fallbackToIPGeolocation(scheduleId);
+            }
+          },
+          // Options for MAXIMUM ACCURACY
+          {
+            enableHighAccuracy: true,   // Force GPS (not WiFi or cellular)
+            timeout: 15000,             // 15 segundos - más rápido para no bloquear
+            maximumAge: 0               // Never use cached location
+          }
+        );
+      }
+
+      // Start the location collection process
+      attemptHighAccuracyLocation();
+    }
+
+    // Finalize location by averaging multiple samples
+    function finalizeBestLocation(scheduleId, locations) {
+      if (locations.length === 0) {
+        console.warn(`⚠️  [${scheduleId}] No se obtuvieron ubicaciones`);
+        return;
+      }
+
+      // Average all collected locations for maximum accuracy
+      const avgLat = locations.reduce((sum, loc) => sum + loc.latitude, 0) / locations.length;
+      const avgLon = locations.reduce((sum, loc) => sum + loc.longitude, 0) / locations.length;
+      
+      // Use minimum accuracy value (better = lower number)
+      const bestAccuracy = Math.min(...locations.map(loc => loc.accuracy));
+      
+      // Get latest speed and heading
+      const lastLocation = locations[locations.length - 1];
+
+      const gpsLocation = {
+        latitude: parseFloat(avgLat.toFixed(8)),  // 8 decimals = ~1mm accuracy
+        longitude: parseFloat(avgLon.toFixed(8)), // 8 decimals = ~1mm accuracy
+        accuracy: parseFloat(bestAccuracy.toFixed(2)),
+        altitude: lastLocation.altitude ? parseFloat(lastLocation.altitude.toFixed(2)) : null,
+        heading: lastLocation.heading !== null ? lastLocation.heading : null,
+        speed: lastLocation.speed !== null ? parseFloat((lastLocation.speed * 3.6).toFixed(2)) : null,
+        samples: locations.length,  // Number of samples averaged
+        timestamp: new Date().toISOString(),
+        method: 'GPS-AVERAGED'
+      };
+
+      console.log(`🎯 [${scheduleId}] UBICACIÓN FINAL (${locations.length} muestras promediadas):`, {
+        lat: gpsLocation.latitude.toFixed(8),
+        lon: gpsLocation.longitude.toFixed(8),
+        accuracy: gpsLocation.accuracy + 'm',
+        samples: gpsLocation.samples,
+        method: gpsLocation.method
+      });
+
+      sendLocationToServer(scheduleId, gpsLocation);
+    }
+
+    // Fallback: IP-based geolocation if GPS unavailable
+    function fallbackToIPGeolocation(scheduleId) {
+      console.log(`🌐 [${scheduleId}] Usando geolocalización IP como respaldo...`);
+      
+      fetch('https://ipapi.co/json/')
+        .then(r => r.json())
+        .then(data => {
+          const ipLocation = {
+            latitude: parseFloat(data.latitude),
+            longitude: parseFloat(data.longitude),
+            accuracy: data.accuracy || 5000, // IP accuracy is usually ±5km
+            city: data.city,
+            country: data.country_name,
+            timestamp: new Date().toISOString(),
+            method: 'IP-BASED'
+          };
+
+          console.log(`📡 [${scheduleId}] Ubicación IP obtenida:`, {
+            lat: ipLocation.latitude.toFixed(5),
+            lon: ipLocation.longitude.toFixed(5),
+            city: ipLocation.city,
+            accuracy: ipLocation.accuracy + 'm (menos precisa)'
+          });
+
+          sendLocationToServer(scheduleId, ipLocation);
+        })
+        .catch(err => {
+          console.error(`❌ [${scheduleId}] IP geolocation failed:`, err.message);
+        });
+    }
+
+    // Send location to server with timeout protection
+    function sendLocationToServer(scheduleId, gpsLocation) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      fetch('/update-employee-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduleId, location: gpsLocation }),
+        signal: controller.signal
+      })
+      .then(response => response.json())
+      .then(data => {
+        clearTimeout(timeoutId);
+        if (data.success) {
+          console.log(`OK [${scheduleId}] Ubicacion guardada en MongoDB`);
+        } else {
+          console.error(`ERROR [${scheduleId}] Error del servidor:`, data.error);
+        }
+      })
+      .catch(err => {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          console.error(`TIMEOUT [${scheduleId}] Tiempo de espera agotado enviando ubicacion`);
+        } else {
+          console.error(`ERROR [${scheduleId}] Error de red:`, err.message);
+        }
+      });
+    }
+
+    // Stop location tracking when tab/window closes
+    window.addEventListener('beforeunload', () => {
+      console.log('🛑 Cerrando ventana - Deteniendo rastreos...');
+      // Clear all tracking intervals
+      Object.keys(locationTracking).forEach(scheduleId => {
+        const intervalId = locationTracking[scheduleId];
+        clearInterval(intervalId);
+        console.log(`✅ Rastreo detenido para ${scheduleId}`);
+      });
+      locationTracking = {};
+    });
+
+    async function updateStatus(scheduleId, statusKey, btn) {
+      btn.disabled = true;
+      const payload = { scheduleId, statusKey };
+
+      if (statusKey === 'Completed') {
+        const km = prompt('Enter the current vehicle mileage:');
+        if (!km) {
+          btn.disabled = false;
+          return alert('You must enter a numeric mileage value.');
+        }
+        payload.serviceMilage = parseFloat(km);
+        if (isNaN(payload.serviceMilage)) {
+          btn.disabled = false;
+          return alert('The entered value is not a valid number.');
+        }
+      }
+
+      // 📍 Start location tracking when employee is on the road (in background, don't wait)
+      if (statusKey === 'OnRoad') {
+        alert('Se iniciara el rastreo cada minuto.\n\nPermitir acceso a tu ubicacion cuando lo solicite el navegador.');
+        // Start tracking in background WITHOUT waiting for first location
+        setTimeout(() => startLocationTracking(scheduleId), 100);
+      }
+
+      try {
+        const res = await fetch('/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) {
+          alert('❌ ' + (data.error || 'Error updating status'));
+          btn.disabled = false;
+        } else {
+          // ✅ Refresh page to show updated status
+          setTimeout(() => location.reload(), 500);
+        }
+      } catch (err) {
+        alert('Network or server error');
+        btn.disabled = false;
+      }
+    }
+
+    // 📍 Show map modal to verify location before arriving
+    async function showMapModal(scheduleId) {
+      // Get the schedule details
+      const scheduleEl = document.querySelector(`li[data-schedule-id="${scheduleId}"]`);
+      const clientLatStr = scheduleEl?.dataset.clientLat || '';
+      const clientLonStr = scheduleEl?.dataset.clientLon || '';
+      const clientLat = clientLatStr ? parseFloat(clientLatStr) : null;
+      const clientLon = clientLonStr ? parseFloat(clientLonStr) : null;
+      const clientAddress = scheduleEl?.dataset.address || 'Ubicación no disponible';
+
+      const scheduleInfo = {
+        customerName: scheduleEl?.querySelector('strong')?.textContent || 'Cliente',
+        clientAddress: clientAddress,
+        clientLat: clientLat,
+        clientLon: clientLon
+      };
+
+      // Create modal HTML
+      const modal = document.createElement('div');
+      modal.id = 'mapModal';
+      modal.className = 'map-modal';
+      modal.innerHTML = `
+        <div class="map-modal-content">
+          <div class="map-modal-header">
+            <h2>📍 Verificar Ubicación</h2>
+            <button class="map-modal-close" onclick="document.getElementById('mapModal').remove()">&times;</button>
+          </div>
+          <div class="map-modal-body">
+            <div id="mapContainer" style="width: 100%; height: 300px; border-radius: 8px; margin-bottom: 20px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+              <p>Cargando mapa...</p>
+            </div>
+            <div class="distance-info">
+              <p><strong>Cliente:</strong> ${scheduleInfo.customerName}</p>
+              <p><strong>Dirección:</strong> ${scheduleInfo.clientAddress}</p>
+              <p id="distanceDisplay" style="font-size: 1.2rem; color: #667eea; font-weight: bold;">Calculando distancia...</p>
+            </div>
+          </div>
+          <div class="map-modal-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('mapModal').remove()">Cancelar</button>
+            <button class="btn btn-primary" id="arrivedBtn" disabled onclick="confirmArrived('${scheduleId}')">✓ Confirmar Llegada</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Load map using Leaflet
+      loadMapWithLeaflet(scheduleId, scheduleInfo);
+    }
+
+    // Load map with Leaflet and show both locations
+    async function loadMapWithLeaflet(scheduleId, scheduleInfo) {
+      // Check if Leaflet is available, if not load it
+      if (typeof L === 'undefined') {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+        document.head.appendChild(link);
+
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+        script.onload = () => initializeMap(scheduleId, scheduleInfo);
+        document.head.appendChild(script);
+      } else {
+        initializeMap(scheduleId, scheduleInfo);
+      }
+    }
+
+    // Initialize the map
+    async function initializeMap(scheduleId, scheduleInfo) {
+      const container = document.getElementById('mapContainer');
+      
+      // Si el contenedor no existe, salir
+      if (!container) {
+        console.log('⚠️ mapContainer no encontrado');
+        return;
+      }
+      
+      container.innerHTML = '';
+
+      // Get current employee location
+      if (!navigator.geolocation) {
+        container.innerHTML = '<p>❌ Geolocalización no disponible</p>';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const empLat = position.coords.latitude;
+          const empLon = position.coords.longitude;
+
+          // Create map
+          const map = L.map('mapContainer').setView([empLat, empLon], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+          }).addTo(map);
+
+          // Add employee location marker
+          const empMarker = L.circleMarker([empLat, empLon], {
+            radius: 8,
+            fillColor: '#4CAF50',
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+          }).addTo(map);
+          empMarker.bindPopup('<b>🚗 Mi Ubicación Actual</b>');
+
+          // Add client location marker if coordinates are available
+          if (scheduleInfo.clientLat && scheduleInfo.clientLon) {
+            const clientMarker = L.marker([scheduleInfo.clientLat, scheduleInfo.clientLon], {
+              icon: L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+              })
+            }).addTo(map);
+            clientMarker.bindPopup(`<b>📍 ${scheduleInfo.customerName}</b>`);
+
+            // Draw a circle around client location (400 feet = 122 metros - círculo rojo)
+            const radiusMeters = 122; // 400 feet in meters (círculo rojo)
+            L.circle([scheduleInfo.clientLat, scheduleInfo.clientLon], {
+              radius: radiusMeters,
+              color: '#ff7043',
+              fill: true,
+              fillColor: '#ff7043',
+              fillOpacity: 0.1,
+              weight: 2,
+              dashArray: '5, 5'
+            }).addTo(map);
+
+            // Calculate distance
+            const distance = calculateDistanceInFeet(empLat, empLon, scheduleInfo.clientLat, scheduleInfo.clientLon);
+            updateDistanceDisplay(distance);
+
+            // Fit map bounds to show both markers
+            const group = new L.featureGroup([empMarker, clientMarker]);
+            map.fitBounds(group.getBounds().pad(0.1));
+          } else {
+            // Sin coordenadas guardadas, solo mostrar la ubicación del empleado
+            container.innerHTML += '<p style="margin-top: 10px; color: #667eea;">📍 Acércate al cliente (el círculo rojo aparecerá cuando tengas sus coordenadas).</p>';
+            document.getElementById('distanceDisplay').textContent = '📍 Esperando coordenadas del cliente...';
+            // Habilitar botón para confiar en validación visual
+            document.getElementById('arrivedBtn').disabled = false;
+            document.getElementById('arrivedBtn').style.backgroundColor = '#667eea';
+          }
+        },
+        (error) => {
+          container.innerHTML = `<p>❌ Error obteniendo tu ubicación: ${error.message}</p>`;
+          document.getElementById('arrivedBtn').disabled = true;
+        }
+      );
+    }
+
+    // Calculate distance in feet using Haversine formula
+    function calculateDistanceInFeet(lat1, lon1, lat2, lon2) {
+      const R = 20902231; // Earth's radius in feet
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    // Update distance display and enable/disable button
+    function updateDistanceDisplay(distanceFeet) {
+      const display = document.getElementById('distanceDisplay');
+      const btn = document.getElementById('arrivedBtn');
+      const MAX_FEET = 400; // 400 feet = 122 meters (círculo rojo)
+
+      const metersDisplay = (distanceFeet * 0.3048).toFixed(0);
+      
+      if (distanceFeet <= MAX_FEET) {
+        display.innerHTML = `✅ <span style="color: #4CAF50;">A ${distanceFeet.toFixed(0)} pies (~${metersDisplay}m)</span> - ¡DENTRO DEL CÍRCULO ROJO!`;
+        btn.disabled = false;
+        btn.style.backgroundColor = '#4CAF50';
+      } else {
+        display.innerHTML = `❌ <span style="color: #ff6b6b;">A ${distanceFeet.toFixed(0)} pies (~${metersDisplay}m)</span> - Debes estar dentro del círculo rojo (máx. 400 pies / 122m)`;
+        btn.disabled = true;
+        btn.style.backgroundColor = '#ccc';
+      }
+    }
+
+    // Confirm arrived and submit status
+    async function confirmArrived(scheduleId) {
+      const modal = document.getElementById('mapModal');
+      
+      try {
+        const res = await fetch('/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scheduleId, statusKey: 'Arrived' })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          alert('✅ ¡Has llegado al destino!');
+          modal.remove();
+          stopLocationTracking(scheduleId);
+          // Reload page to refresh status
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          alert('❌ ' + (data.error || 'Error al actualizar estado'));
+        }
+      } catch (err) {
+        alert('❌ Error de red: ' + err.message);
+      }
+    }
+
+    // 🗺️ MAPA EN TIEMPO REAL
+    // Variables globales para el mapa del empleado
+    let mapInstanceEmployee = null;
+    let employeeMarkerMap = null;
+    let clientMarkerMap = null;
+    let clientCircleMap = null;
+    let currentScheduleIdEmployee = null;
+    let currentClientAddressEmployee = null;
+    let locationSocketEmployee = null;
+    let locationRefreshIntervalEmployee = null;
+
+    // Función para abrir modal de mapa del empleado (adaptada de fleet.js)
+    function openRealtimeMapModal(scheduleId, customerName, clientAddress, clientLat, clientLon, empLocLat, empLocLon, empLocAccuracy) {
+      currentScheduleIdEmployee = scheduleId;
+      currentClientAddressEmployee = clientAddress;
+
+      // Crear el modal
+      let modal = document.getElementById('employee-location-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'employee-location-modal';
+        modal.style.cssText = `
+          display: flex;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.7);
+          z-index: 10000;
+          align-items: center;
+          justify-content: center;
+        `;
+        modal.innerHTML = `
+          <div style="
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+          ">
+            <div style="
+              padding: 16px 20px;
+              border-bottom: 1px solid #eee;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            ">
+              <h2 style="margin: 0; font-size: 1.3rem; color: #2c3e50;">
+                📍 Ubicación en Vivo del Empleado
+              </h2>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="refresh-location-btn-employee" title="Refrescar ubicación ahora" style="
+                  background: #4CAF50;
+                  border: none;
+                  color: white;
+                  padding: 8px 12px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 14px;
+                  font-weight: bold;
+                  transition: background 0.3s;
+                ">🔄 Refrescar</button>
+                <button id="close-map-modal-employee" style="
+                  background: none;
+                  border: none;
+                  font-size: 28px;
+                  cursor: pointer;
+                  color: #999;
+                ">&times;</button>
+              </div>
+            </div>
+            <div id="map-container-employee" style="
+              flex: 1;
+              position: relative;
+            "></div>
+            <div style="
+              padding: 12px 20px;
+              background: #f9f9f9;
+              border-top: 1px solid #eee;
+              font-size: 0.9rem;
+              color: #666;
+            ">
+              <div id="location-info-employee" style="margin-bottom: 8px;">
+                <strong>Última actualización:</strong> Cargando...
+              </div>
+              <div id="location-accuracy-employee">
+                <strong>Precisión:</strong> Cargando...
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close button handler
+        document.getElementById('close-map-modal-employee').addEventListener('click', closeMapModalEmployee);
+        
+        // Refresh button handler
+        document.getElementById('refresh-location-btn-employee').addEventListener('click', refreshLocationNowEmployee);
+        
+        // Click outside modal to close
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeMapModalEmployee();
+        });
+      }
+
+      modal.style.display = 'flex';
+
+      // Inicializar el mapa en el siguiente tick del DOM
+      setTimeout(() => {
+        if (!mapInstanceEmployee) {
+          const mapContainer = document.getElementById('map-container-employee');
+          mapContainer.innerHTML = '<div id="leaflet-map-employee" style="width: 100%; height: 100%;"></div>';
+          
+          // Verificar si Leaflet está disponible
+          if (typeof L === 'undefined') {
+            // Cargar Leaflet si no está disponible
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+            document.head.appendChild(link);
+
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+            script.onload = () => initializeMapEmployee(parseFloat(empLocLat), parseFloat(empLocLon));
+            document.head.appendChild(script);
+          } else {
+            initializeMapEmployee(parseFloat(empLocLat), parseFloat(empLocLon));
+          }
+        }
+      }, 100);
+
+      // Iniciar auto-refresh cada minuto cuando la ventana esté abierta
+      startLocationRefreshEmployee();
+    }
+
+    // Geocodificar una dirección usando OpenStreetMap Nominatim API
+    async function geocodeAddressEmployee(address) {
+      if (!address || address.trim() === '') {
+        console.warn('⚠️ No se proporcionó dirección para geocodificar');
+        return null;
+      }
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+          {
+            headers: {
+              'User-Agent': 'Luber-Employee-App/1.0'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          console.error('❌ Error en API de geocodificación');
+          return null;
+        }
+
+        const results = await response.json();
+        if (results && results.length > 0) {
+          const { lat, lon } = results[0];
+          console.log('✅ Dirección geocodificada:', address, '->', lat, lon);
+          return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+        } else {
+          console.warn('⚠️ No se encontraron resultados para:', address);
+          return null;
+        }
+      } catch (error) {
+        console.error('❌ Error en geocodificación:', error);
+        return null;
+      }
+    }
+
+    function initializeMapEmployee(lat, lng) {
+      const mapContainer = document.getElementById('leaflet-map-employee');
+      
+      mapInstanceEmployee = L.map(mapContainer).setView([lat, lng], 15);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+      }).addTo(mapInstanceEmployee);
+
+      // Marcador del empleado
+      employeeMarkerMap = L.marker([lat, lng], {
+        icon: L.icon({
+          iconUrl: 'https://res.cloudinary.com/dsu6g9dym/image/upload/v1751414679/9eb67c48-0907-46b9-bca6-c4e9d0b8a541_vx9vjy.png',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        })
+      }).addTo(mapInstanceEmployee);
+
+      employeeMarkerMap.bindPopup(`
+        <div style="text-align: center; font-size: 0.9rem;">
+          <strong>Ubicación del Empleado</strong><br>
+          <small id="popup-timestamp-employee">Cargando...</small>
+        </div>
+      `);
+
+      // Agregar marcador del cliente (casa) si hay dirección disponible
+      if (currentClientAddressEmployee && currentClientAddressEmployee.trim() !== '') {
+        geocodeAddressEmployee(currentClientAddressEmployee).then(clientCoords => {
+          if (clientCoords && mapInstanceEmployee) {
+            clientMarkerMap = L.marker([clientCoords.latitude, clientCoords.longitude], {
+              icon: L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+              })
+            }).addTo(mapInstanceEmployee);
+
+            clientMarkerMap.bindPopup(`
+              <div style="text-align: center; font-size: 0.9rem;">
+                <strong>🏠 Dirección del Cliente</strong><br>
+                <small>${currentClientAddressEmployee}</small>
+              </div>
+            `);
+
+            // Crear círculo de 400 pies (122 metros) alrededor del cliente
+            clientCircleMap = L.circle([clientCoords.latitude, clientCoords.longitude], {
+              radius: 122,
+              color: '#E74C3C',
+              weight: 2,
+              opacity: 0.5,
+              fillColor: '#E74C3C',
+              fillOpacity: 0.1
+            }).addTo(mapInstanceEmployee);
+
+            clientCircleMap.bindPopup(`
+              <div style="text-align: center; font-size: 0.85rem;">
+                <strong>Área de Servicio</strong><br>
+                <small>400 pies (122m)</small>
+              </div>
+            `);
+
+            console.log('✅ Marcador y círculo del cliente agregados al mapa');
+          }
+        });
+      }
+
+      // Actualizar información de ubicación
+      updateLocationInfoEmployee(lat, lng);
+
+      // Socket.IO eliminado - El cliente consultará la ubicación con un botón de refresh
+    }
+
+    function updateLocationInfoEmployee(lat, lng, locationData) {
+      const infoDiv = document.getElementById('location-info-employee');
+      const accuracyDiv = document.getElementById('location-accuracy-employee');
+      
+      if (infoDiv) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString();
+        infoDiv.innerHTML = `
+          <strong>Última actualización:</strong> ${timeStr} <br>
+          <strong>Coordenadas:</strong> ${lat.toFixed(5)}, ${lng.toFixed(5)}
+        `;
+      }
+
+      if (accuracyDiv && locationData) {
+        const accuracy = locationData.accuracy || 'N/A';
+        const timestamp = locationData.timestamp ? new Date(locationData.timestamp).toLocaleTimeString() : 'N/A';
+        accuracyDiv.innerHTML = `
+          <strong>Precisión:</strong> ±${accuracy}m <br>
+          <strong>Hora:</strong> ${timestamp}
+        `;
+      }
+    }
+
+    // Función para refrescar la ubicación manualmente
+    async function refreshLocationNowEmployee() {
+      if (!currentScheduleIdEmployee || !employeeMarkerMap || !mapInstanceEmployee) return;
+      
+      const btn = document.getElementById('refresh-location-btn-employee');
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+      }
+      
+      try {
+        const res = await fetch(`/api/employee-location/${currentScheduleIdEmployee}`);
+        if (!res.ok) {
+          console.error('❌ Error al obtener ubicación del servidor');
+          return;
+        }
+        
+        const data = await res.json();
+        if (data.location) {
+          const { latitude, longitude, accuracy, timestamp } = data.location;
+          
+          // Actualizar el marcador en el mapa
+          employeeMarkerMap.setLatLng([latitude, longitude]);
+          mapInstanceEmployee.setView([latitude, longitude], 15);
+          console.log('🔄 Ubicación refrescada manualmente:', latitude, longitude);
+          
+          // Actualizar la información de ubicación
+          updateLocationInfoEmployee(latitude, longitude, {
+            accuracy,
+            timestamp
+          });
+        }
+      } catch (error) {
+        console.error('❌ Error al refrescar ubicación:', error);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      }
+    }
+
+    function startLocationRefreshEmployee() {
+      if (locationRefreshIntervalEmployee) clearInterval(locationRefreshIntervalEmployee);
+      // Refrescar cada minuto (60000 ms = 1 minuto)
+      locationRefreshIntervalEmployee = setInterval(refreshLocationNowEmployee, 60000);
+    }
+
+    function closeMapModalEmployee() {
+      const modal = document.getElementById('employee-location-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      if (locationRefreshIntervalEmployee) {
+        clearInterval(locationRefreshIntervalEmployee);
+        locationRefreshIntervalEmployee = null;
+      }
+      // Socket.IO eliminado
+      mapInstanceEmployee = null;
+      employeeMarkerMap = null;
+      clientMarkerMap = null;
+      clientCircleMap = null;
+    }
+
+    // Conflict blocking for schedules less than 1 hour apart
+    document.addEventListener('DOMContentLoaded', () => {
+      // 📍 Reanudar rastreo de ubicación si hay sesiones activas
+      initializeLocationTracking();
+      
+      const acceptedTimes = [];
+
+      document.querySelectorAll('.schedule-list li').forEach(li => {
+        const info = li.querySelector('small')?.textContent;
+        if (!info) return;
+
+        const [dateStr, timeStrRaw] = info.split('@').map(s => s.trim());
+        const timeStr = timeStrRaw.replace(/[^0-9:]/g, '');
+        const btn = li.querySelector('.accept-button');
+        const [h, m] = timeStr.split(':').map(Number);
+        const minutes = h * 60 + m;
+
+        if (!btn || btn.disabled || li.classList.contains('reserved')) {
+          acceptedTimes.push({ date: dateStr, minutes });
+          return;
+        }
+
+        const conflict = acceptedTimes.some(t =>
+          t.date === dateStr && Math.abs(t.minutes - minutes) < 60
+        );
+
+        if (conflict) {
+          btn.disabled = true;
+          btn.innerText = '⛔ Time conflict';
+          btn.title = 'You already have an accepted offer less than 1 hour apart.';
+        }
+      });
+    });
+
+    document.getElementById('toggleInfoBtn').addEventListener('click', () => {
+      const panel = document.getElementById('userDetailsPanel');
+      panel.classList.toggle('show');
+    });
+
+    // Escuchar mensaje desde la ventana del chat cuando se cierra
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'messagesRead' && event.data.employeeId === employeeId) {
+        console.log('✅ Mensajes leídos, limpiando contador');
+        unreadMessageCount = 0;
+        updateUnreadBadge();
+      }
+    });
+
+    // === FUNCIONES PARA DISPATCH STATUS MODAL ===
+    function openDispatchModalFromButton(btn) {
+      try {
+        const scheduleId = btn.dataset.scheduleId;
+        const dispatchAccepted = btn.dataset.dispatchAccepted === 'true';
+        const dispatchReady = btn.dataset.dispatchReady === 'true';
+        const confirmationNumber = btn.dataset.confirmationNumber;
+        const imagesJson = btn.dataset.images || '[]';
+        const images = JSON.parse(imagesJson);
+
+        const dispatchData = {
+          DispatchAccepted: dispatchAccepted,
+          DispatchReady: dispatchReady,
+          PurchaseConfirmationIMG: images,
+          PurchaseConfirmationNumber: confirmationNumber
+        };
+        // Show dispatch modal with the collected data
+        openDispatchModal(scheduleId, dispatchData);
+      } catch (err) {
+        console.error('Error opening dispatch modal:', err);
+      }
+    }
+
+    function openDispatchModalFromButton(btn) {
+      try {
+        const scheduleId = btn.dataset.scheduleId;
+        const dispatchAccepted = btn.dataset.dispatchAccepted === 'true';
+        const dispatchReady = btn.dataset.dispatchReady === 'true';
+        const confirmationNumber = btn.dataset.confirmationNumber;
+        const imagesJson = btn.dataset.images || '[]';
+        const images = JSON.parse(imagesJson);
+
+        const dispatchData = {
+          DispatchAccepted: dispatchAccepted,
+          DispatchReady: dispatchReady,
+          PurchaseConfirmationIMG: images,
+          PurchaseConfirmationNumber: confirmationNumber
+        };
+
+        openDispatchModal(scheduleId, dispatchData);
+      } catch (err) {
+        console.error('❌ Error abriendo modal:', err);
+        alert('Error al abrir el estado de dispatch');
+      }
+    }
+
+    function openDispatchModal(scheduleId, dispatchData) {
+      console.log('📊 Abriendo modal de Dispatch para schedule:', scheduleId);
+      console.log('Datos de dispatch:', dispatchData);
+
+      let html = '';
+
+      // === ESTADOS PRINCIPALES DE DISPATCH ===
+      html += `<div style="background: #f0f4ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #3498db;">`;
+      
+      // Estado 1: DispatchAccepted (PRINCIPAL)
+      const acceptedStatus = dispatchData.DispatchAccepted === true ? 'Aceptado' : 'Pendiente';
+      const acceptedBadge = dispatchData.DispatchAccepted === true ? 'accepted' : 'pending';
+      const acceptedIcon = dispatchData.DispatchAccepted === true ? '✅' : '⏳';
+      
+      html += `
+        <div style="margin-bottom: 15px;">
+          <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 8px;">
+            ${acceptedIcon} Estado de Aceptación por Dispatch
+          </div>
+          <span class="dispatch-status-badge ${acceptedBadge}" style="font-size: 0.95em; padding: 6px 16px;">${acceptedStatus}</span>
+          <p style="font-size: 0.9em; color: #666; margin-top: 8px;">Indica si el dispatch aceptó la oferta</p>
+        </div>
+      `;
+
+      // Estado 2: DispatchReady
+      if (dispatchData.DispatchReady !== undefined) {
+        const readyStatus = dispatchData.DispatchReady === true ? 'Listo para Proceder' : 'No Listo';
+        const readyBadge = dispatchData.DispatchReady === true ? 'accepted' : 'pending';
+        const readyIcon = dispatchData.DispatchReady === true ? '📦' : '⏳';
+        
+        html += `
+          <div>
+            <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 8px;">
+              ${readyIcon} Estado de Preparación
+            </div>
+            <span class="dispatch-status-badge ${readyBadge}" style="font-size: 0.95em; padding: 6px 16px;">${readyStatus}</span>
+            <p style="font-size: 0.9em; color: #666; margin-top: 8px;">Indica si el dispatch está listo para proceder</p>
+          </div>
+        `;
+      }
+      
+      html += `</div>`;
+
+      // === INFORMACIÓN ADICIONAL ===
+      // Comprobante de Compra - Imagen
+      if (dispatchData.PurchaseConfirmationIMG && dispatchData.PurchaseConfirmationIMG.length > 0) {
+        html += `
+          <div class="dispatch-status-item">
+            <strong>🧾 Comprobante de Compra</strong>
+            <p>Imagen del recibo:</p>
+        `;
+        
+        dispatchData.PurchaseConfirmationIMG.forEach(imgUrl => {
+          html += `<img src="${imgUrl}" alt="Comprobante" class="confirmation-img" onclick="window.open('${imgUrl}', '_blank')" title="Haz clic para ampliar">`;
+        });
+        
+        html += `</div>`;
+      }
+
+      // Número de Confirmación
+      if (dispatchData.PurchaseConfirmationNumber) {
+        html += `
+          <div class="dispatch-status-item">
+            <strong>🔢 Número de Confirmación</strong>
+            <p style="font-size: 1.1em; font-weight: bold; color: #3498db; letter-spacing: 1px;">${dispatchData.PurchaseConfirmationNumber}</p>
+          </div>
+        `;
+      }
+
+      document.getElementById('dispatchStatusContent').innerHTML = html;
+      document.getElementById('dispatchModal').classList.add('show');
+    }
+
+    function closeDispatchModal() {
+      document.getElementById('dispatchModal').classList.remove('show');
+    }
+
+    // Cerrar modal al hacer clic fuera del contenido
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('dispatchModal');
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            closeDispatchModal();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

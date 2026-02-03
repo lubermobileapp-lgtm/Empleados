@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verificación de Documentos - Luber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #667eea;
+      --secondary: #764ba2;
+      --success: #28a745;
+      --pending: #ffc107;
+      --light: #ecf0f1;
+      --dark: #34495e;
+      --radius: 10px;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-image: url('https://res.cloudinary.com/dsu6g9dym/image/upload/v1768761333/uploads/background-1768761331053.png');
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: -1;
+    }
+    
+    .approval-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      color: #333;
+    }
+    
+    .logo {
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+    
+    .header {
+      margin-bottom: 40px;
+    }
+    
+    .header h1 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    /* PROGRESS STEPS */
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 40px 0;
+      position: relative;
+    }
+    
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 25px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #e0e0e0;
+      z-index: 0;
+    }
+    
+    .progress-line {
+      position: absolute;
+      top: 25px;
+      left: 0;
+      height: 3px;
+      background: var(--success);
+      transition: width 0.5s ease;
+      z-index: 1;
+    }
+    
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+    }
+    
+    .step-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 3px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: white;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .step.pending .step-circle {
+      border-color: var(--pending);
+      color: var(--pending);
+    }
+    
+    .step.pending .step-label {
+      color: var(--pending);
+    }
+    
+    .step.approved .step-circle {
+      border-color: var(--success);
+      background: var(--success);
+      color: white;
+    }
+    
+    .step.approved .step-label {
+      color: var(--success);
+      font-weight: 700;
+    }
+    
+    .step-label {
+      font-size: 0.85rem;
+      color: #999;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .step-sublabel {
+      font-size: 0.7rem;
+      color: #bbb;
+      margin-top: 3px;
+    }
+    
+    /* INFO BOX */
+    .info-box {
+      background: #f8f9fa;
+      border-left: 4px solid var(--primary);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 30px 0;
+      text-align: left;
+    }
+    
+    .info-box h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    
+    .info-box p {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    
+    .info-box ul {
+      list-style: none;
+      margin-top: 10px;
+    }
+    
+    .info-box li {
+      padding: 5px 0;
+      color: #666;
+      font-size: 0.95rem;
+    }
+    
+    .info-box li::before {
+      content: '✓ ';
+      color: var(--success);
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .info-box li.pending::before {
+      content: '⏳ ';
+      color: var(--pending);
+    }
+    
+    /* COMPLETION MESSAGE */
+    .completion-box {
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+    
+    .completion-box.active {
+      display: block;
+    }
+    
+    .completion-box h2 {
+      color: var(--success);
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+    }
+    
+    .completion-box p {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    
+    .btn-redirect {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+    
+    .btn-redirect:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(102, 126, 234, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .approval-container {
+        padding: 25px;
+      }
+      
+      .logo {
+        height: 40px;
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .step-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+      
+      .step-label {
+        font-size: 0.8rem;
+      }
+      
+      .step-sublabel {
+        font-size: 0.65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="approval-container">
+    <!-- LOGO -->
+    <img src="https://res.cloudinary.com/dsu6g9dym/image/upload/v1755006521/logo_hjrj3p.png" alt="Luber Logo" class="logo">
+    
+    <!-- HEADER -->
+    <div class="header">
+      <h1>📋 Verificación de Documentos</h1>
+      <p>Estado en tiempo real de tu aprobación</p>
+    </div>
+    
+    <!-- PROGRESS STEPS -->
+    <div class="progress-steps">
+      <div class="progress-line" id="progressLine"></div>
+      
+      <div class="step" id="stepId">
+        <div class="step-circle">🪪</div>
+        <div class="step-label">ID/Licencia</div>
+        <div class="step-sublabel">Paso 1 de 4</div>
+      </div>
+      
+      <div class="step" id="stepSsn">
+        <div class="step-circle">🔢</div>
+        <div class="step-label">SSN</div>
+        <div class="step-sublabel">Paso 2 de 4</div>
+      </div>
+      
+      <div class="step" id="stepCert">
+        <div class="step-circle">📜</div>
+        <div class="step-label">Certificación</div>
+        <div class="step-sublabel">Paso 3 de 4</div>
+      </div>
+      
+      <div class="step" id="stepCv">
+        <div class="step-circle">📄</div>
+        <div class="step-label">CV</div>
+        <div class="step-sublabel">Paso 4 de 4</div>
+      </div>
+    </div>
+    
+    <!-- DETAILS BOX -->
+    <div class="info-box">
+      <h3>📊 Estado de tu Aprobación</h3>
+      <ul id="approvalStatus">
+        <li id="statusId" class="pending">ID/Licencia: Pendiente</li>
+        <li id="statusSsn" class="pending">SSN: Pendiente</li>
+        <li id="statusCert" class="pending">Certificación: Pendiente</li>
+        <li id="statusCv" class="pending">CV: Pendiente</li>
+      </ul>
+    </div>
+    
+    <!-- LOADING STATE -->
+    <div id="loadingState">
+      <div class="spinner"></div>
+      <p style="color: #666; margin-top: 10px;">Buscando tu estado de aprobación...</p>
+    </div>
+    
+    <!-- COMPLETION STATE -->
+    <div id="completionState" class="completion-box">
+      <h2>✅ ¡Verificación Completada!</h2>
+      <p>Todos tus documentos han sido aprobados correctamente.</p>
+      <p>Ya puedes acceder a tu cuenta y ver los horarios disponibles.</p>
+      <button class="btn-redirect" onclick="window.location.href='/login'">
+        Ir al Login →
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const EMPLOYEE_ID = "<%= empId %>";
+    let approvalCheckInterval = null;
+    
+    let currentStatus = {
+      idApproved: false,
+      ssnApproved: false,
+      certApproved: false,
+      resumeApproved: false,
+      hasResume: false
+    };
+    
+    // Cargar estado inicial
+    async function loadApprovalStatus() {
+      try {
+        const response = await fetch(`/api/employee/approval-status/${EMPLOYEE_ID}`);
+        if (response.ok) {
+          currentStatus = await response.json();
+          updateUI();
+        }
+      } catch (error) {
+        console.error('Error loading approval status:', error);
+      }
+    }
+    
+    // Actualizar UI con el estado actual
+    function updateUI() {
+      // Actualizar steps
+      updateStep('Id', currentStatus.idApproved);
+      updateStep('Ssn', currentStatus.ssnApproved);
+      updateStep('Cert', currentStatus.certApproved);
+      
+      // CV solo si tiene resume
+      const cvStep = document.getElementById('stepCv');
+      if (currentStatus.hasResume) {
+        updateStep('Cv', currentStatus.resumeApproved);
+        cvStep.style.display = 'flex';
+      } else {
+        cvStep.style.display = 'none';
+      }
+      
+      // Actualizar status text
+      updateStatusText('Id', currentStatus.idApproved, 'ID/Licencia');
+      updateStatusText('Ssn', currentStatus.ssnApproved, 'SSN');
+      updateStatusText('Cert', currentStatus.certApproved, 'Certificación');
+      
+      if (currentStatus.hasResume) {
+        updateStatusText('Cv', currentStatus.resumeApproved, 'CV');
+      }
+      
+      // Actualizar progress line
+      updateProgressLine();
+      
+      // Verificar si está todo aprobado
+      const allApproved = currentStatus.hasResume 
+        ? currentStatus.idApproved && currentStatus.ssnApproved && currentStatus.certApproved && currentStatus.resumeApproved
+        : currentStatus.idApproved && currentStatus.ssnApproved && currentStatus.certApproved;
+      
+      if (allApproved) {
+        showCompletion();
+      }
+    }
+    
+    function updateStep(stepName, isApproved) {
+      const step = document.getElementById(`step${stepName}`);
+      if (step) {
+        step.classList.remove('pending', 'approved');
+        step.classList.add(isApproved ? 'approved' : 'pending');
+      }
+    }
+    
+    function updateStatusText(stepName, isApproved, label) {
+      const statusEl = document.getElementById(`status${stepName}`);
+      if (statusEl) {
+        statusEl.classList.remove('pending', 'approved');
+        statusEl.classList.add(isApproved ? 'approved' : 'pending');
+        statusEl.innerHTML = isApproved 
+          ? `✓ ${label}: <strong style="color: var(--success);">Aprobado</strong>`
+          : `⏳ ${label}: <strong style="color: var(--pending);">En Espera</strong>`;
+      }
+    }
+    
+    function updateProgressLine() {
+      const approved = [
+        currentStatus.idApproved,
+        currentStatus.ssnApproved,
+        currentStatus.certApproved,
+        currentStatus.hasResume ? currentStatus.resumeApproved : true
+      ].filter(Boolean).length;
+      
+      const total = currentStatus.hasResume ? 4 : 3;
+      const percentage = (approved / total) * 100;
+      
+      const progressLine = document.getElementById('progressLine');
+      progressLine.style.width = percentage + '%';
+    }
+    
+    function showCompletion() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('completionState').classList.add('active');
+    }
+    
+    // Iniciar verificación periódica de estado (cada 5 segundos)
+    function startApprovalStatusCheck() {
+      if (approvalCheckInterval) clearInterval(approvalCheckInterval);
+      approvalCheckInterval = setInterval(loadApprovalStatus, 5000);
+    }
+    
+    // Detener verificación
+    function stopApprovalStatusCheck() {
+      if (approvalCheckInterval) {
+        clearInterval(approvalCheckInterval);
+        approvalCheckInterval = null;
+      }
+    }
+    
+    // Escuchar cambios (Sin Socket.IO - verificación periódica cada 5 segundos)
+    
+    // Cargar estado al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+      loadApprovalStatus();
+      startApprovalStatusCheck();
+    });
+
+    // Detener verificación cuando se cierre la ventana
+    window.addEventListener('beforeunload', stopApprovalStatusCheck);
+  </script>
+</body>
+</html>

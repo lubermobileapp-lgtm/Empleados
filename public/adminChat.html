@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Employees Chat Dashboard - Luber</title>
+  <link rel="stylesheet" href="/css/adminChat.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .admin-chat-container {
+      display: flex;
+      height: 100vh;
+      background: white;
+    }
+
+    /* SIDEBAR - LISTA DE EMPLEADOS */
+    .sidebar {
+      width: 320px;
+      background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar h2 {
+      padding: 20px;
+      font-size: 1.3em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .search-box {
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      outline: none;
+      font-size: 0.9em;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      transition: all 0.3s;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .search-box input:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #3498db;
+      box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+    }
+
+    .employees-list {
+      flex: 1;
+      overflow-y: auto;
+      list-style: none;
+      padding: 8px 0;
+    }
+
+    .employee-item {
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .employee-item:hover {
+      background: rgba(52, 152, 219, 0.15);
+      border: 1px solid rgba(52, 152, 219, 0.3);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+      transform: translateX(4px);
+    }
+
+    .employee-item.active {
+      background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(46, 204, 113, 0.1) 100%);
+      border: 2px solid #3498db;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.25);
+    }
+
+    .employee-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1em;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+      color: white;
+    }
+
+    .employee-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .employee-name {
+      font-weight: 600;
+      font-size: 0.95em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .employee-status {
+      font-size: 0.8em;
+      opacity: 0.8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .unread-counter {
+      font-size: 0.8em;
+      color: #e74c3c;
+      font-weight: 600;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      animation: counterPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes counterPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .unread-badge {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: bold;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+      animation: badgePulse 2s infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* MAIN CONTENT - TABS Y CHAT */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* CHAT TABS */
+    .chat-tabs {
+      display: flex;
+      background: #ecf0f1;
+      border-bottom: 2px solid #bdc3c7;
+      overflow-x: auto;
+      gap: 5px;
+      padding: 8px;
+    }
+
+    .chat-tab {
+      padding: 10px 15px;
+      background: white;
+      border: 1px solid #bdc3c7;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      font-size: 0.9em;
+    }
+
+    .chat-tab:hover {
+      background: #f8f9fa;
+    }
+
+    .chat-tab.active {
+      background: white;
+      border-bottom: 3px solid #3498db;
+      font-weight: 600;
+      color: #3498db;
+    }
+
+    .chat-tab .close-tab {
+      cursor: pointer;
+      font-weight: bold;
+      color: #e74c3c;
+      margin-left: 5px;
+      font-size: 1.2em;
+      line-height: 1;
+    }
+
+    .chat-tab .close-tab:hover {
+      color: #c0392b;
+    }
+
+    /* CHAT PANEL */
+    .chat-panels {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      flex-direction: column;
+      background: white;
+    }
+
+    .chat-panel.active {
+      display: flex;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-header-info {
+      flex: 1;
+    }
+
+    .chat-header-title {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .chat-header-subtitle {
+      font-size: 0.85em;
+      opacity: 0.9;
+    }
+
+    .chat-header-actions button {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background 0.3s;
+      font-size: 0.9em;
+    }
+
+    .chat-header-actions button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    #logoutBtn {
+      background: rgba(220, 53, 69, 0.8);
+    }
+
+    #logoutBtn:hover {
+      background: rgba(220, 53, 69, 1);
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .msg {
+      display: flex;
+      margin-bottom: 8px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg.sent {
+      justify-content: flex-end;
+    }
+
+    .msg.received {
+      justify-content: flex-start;
+    }
+
+    .msg-bubble {
+      max-width: 60%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      word-wrap: break-word;
+      font-size: 0.95em;
+      line-height: 1.4;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    }
+
+    .msg.sent .msg-bubble {
+      background: #3498db;
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+    }
+
+    .msg.received .msg-bubble {
+      background: white;
+      color: #333;
+      border-radius: 18px 18px 18px 4px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .msg-image {
+      max-width: 200px;
+      margin-top: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .msg-time {
+      font-size: 0.75em;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .chat-form {
+      padding: 15px 20px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .chat-form input,
+    .chat-form textarea {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 0.95em;
+      outline: none;
+      resize: none;
+      max-height: 100px;
+    }
+
+    .chat-form input:focus,
+    .chat-form textarea:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .image-upload {
+      cursor: pointer;
+      background: #ecf0f1;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 1.2em;
+      transition: background 0.3s;
+    }
+
+    .image-upload:hover {
+      background: #d5dbdb;
+    }
+
+    .chat-form input[type="file"] {
+      display: none;
+    }
+
+    .chat-form button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      font-size: 0.95em;
+    }
+
+    .chat-form button:hover {
+      background: #2980b9;
+    }
+
+    .empty-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      flex-direction: column;
+      color: #7f8c8d;
+      text-align: center;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    /* NOTIFICACIONES DE MENSAJES */
+    .message-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-left: 4px solid #3498db;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      animation: slideInNotification 0.3s ease;
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    @keyframes slideInNotification {
+      from {
+        transform: translateX(450px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .notification-sender {
+      font-weight: 600;
+      color: #3498db;
+      font-size: 0.95em;
+    }
+
+    .notification-message {
+      color: #555;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+
+    .notification-time {
+      color: #999;
+      font-size: 0.75em;
+      margin-top: 6px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      .sidebar {
+        width: 250px;
+      }
+
+      .msg-bubble {
+        max-width: 75%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .admin-chat-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: 200px;
+        border-bottom: 2px solid #bdc3c7;
+      }
+
+      .main-content {
+        flex: 1;
+      }
+
+      .msg-bubble {
+        max-width: 85%;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #bdc3c7;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #95a5a6;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-chat-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2>📋 Empleados</h2>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Buscar empleado...">
+      </div>
+      <ul class="employees-list" id="employeeList"></ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- TABS -->
+      <div class="chat-tabs" id="chatTabs">
+        <div style="padding: 10px 15px; color: #7f8c8d; font-size: 0.9em;">
+          Selecciona un empleado para empezar
+        </div>
+      </div>
+
+      <!-- CHAT PANELS -->
+      <div class="chat-panels" id="chatPanels">
+        <div class="empty-state">
+          <div style="font-size: 3em; margin-bottom: 10px;">💬</div>
+          <h3>Bienvenido al Panel de Chat</h3>
+          <p>Selecciona un empleado de la lista para comenzar una conversación</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const employeeList = document.getElementById('employeeList');
+    const chatTabs = document.getElementById('chatTabs');
+    const chatPanels = document.getElementById('chatPanels');
+    const searchInput = document.getElementById('searchInput');
+
+    const openChats = {}; // { employeeId: { name, email, panel, messages } }
+    let allEmployees = [];
+    let filteredEmployees = [];
+    let unreadMessages = {}; // { employeeId: count }
+
+    // === FUNCIÓN PARA ACTUALIZAR UN EMPLEADO EN LA LISTA ===
+    function updateEmployeeItemInList(employeeId) {
+      const itemElement = document.getElementById(`employee-item-${employeeId}`);
+      const count = unreadMessages[employeeId] || 0;
+      
+      if (!itemElement) return;
+      
+      // Actualizar/crear contador bajo el nombre
+      let counterElement = document.getElementById(`counter-${employeeId}`);
+      
+      if (count > 0) {
+        if (!counterElement) {
+          const infoElement = itemElement.querySelector('.employee-info');
+          if (infoElement) {
+            counterElement = document.createElement('div');
+            counterElement.className = 'unread-counter';
+            counterElement.id = `counter-${employeeId}`;
+            infoElement.appendChild(counterElement);
+          }
+        }
+        
+        if (counterElement) {
+          counterElement.textContent = `📬 ${count} mensaje${count > 1 ? 's' : ''} sin responder`;
+          counterElement.style.display = 'block';
+        }
+      } else {
+        // Remover contador cuando es 0
+        if (counterElement) {
+          counterElement.remove();
+        }
+      }
+    }
+
+    // === FUNCIÓN PARA ACTUALIZAR BADGE DE MENSAJES SIN LEER ===
+    function updateUnreadBadge(employeeId) {
+      const count = unreadMessages[employeeId] || 0;
+      const itemElement = document.getElementById(`employee-item-${employeeId}`);
+      
+      if (count > 0) {
+        // Actualizar/crear contador bajo el nombre
+        let counterElement = document.getElementById(`counter-${employeeId}`);
+        if (!counterElement && itemElement) {
+          const infoElement = itemElement.querySelector('.employee-info');
+          if (infoElement) {
+            counterElement = document.createElement('div');
+            counterElement.className = 'unread-counter';
+            counterElement.id = `counter-${employeeId}`;
+            infoElement.appendChild(counterElement);
+          }
+        }
+        
+        if (counterElement) {
+          counterElement.textContent = `📬 ${count} mensaje${count > 1 ? 's' : ''} sin responder`;
+          counterElement.style.display = 'block';
+        }
+      } else if (itemElement) {
+        // Remover contador cuando es 0
+        const counterElement = document.getElementById(`counter-${employeeId}`);
+        if (counterElement) {
+          counterElement.remove();
+        }
+      }
+    }
+
+    // === FUNCIÓN PARA MOSTRAR NOTIFICACIONES ===
+    function showMessageNotification(employeeName, messagePreview, employeeId) {
+      const notification = document.createElement('div');
+      notification.className = 'message-notification';
+      
+      const timestamp = new Date().toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      
+      // Obtener email del empleado
+      const employee = allEmployees.find(e => e._id === employeeId);
+      const employeeEmail = employee && employee.email ? employee.email : 'email@example.com';
+      
+      notification.innerHTML = `
+        <div class="notification-header">
+          <span>📬 Nuevo Mensaje</span>
+        </div>
+        <div style="font-weight: 600; color: #2c3e50; margin-bottom: 6px;">
+          De: ${employeeName}
+        </div>
+        <div class="notification-message">
+          "${messagePreview}"
+        </div>
+        <div class="notification-time">${timestamp}</div>
+      `;
+      
+      notification.style.cursor = 'pointer';
+      notification.addEventListener('click', () => {
+        openChat(employeeId, employeeName, employeeEmail);
+        notification.remove();
+      });
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remover después de 5 segundos
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.style.animation = 'slideInNotification 0.3s ease reverse';
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 5000);
+    }
+
+    // === CARGAR EMPLEADOS ===
+    async function loadEmployees() {
+      try {
+        const res = await fetch('/api/chat/employees');
+        allEmployees = await res.json();
+        filteredEmployees = [...allEmployees];
+        renderEmployeeList();
+      } catch (err) {
+        console.error('❌ Error cargando empleados:', err);
+      }
+    }
+
+    // === RENDERIZAR LISTA DE EMPLEADOS ===
+    function renderEmployeeList() {
+      employeeList.innerHTML = '';
+      filteredEmployees.forEach(emp => {
+        const li = document.createElement('li');
+        li.className = 'employee-item' + (openChats[emp._id] ? ' active' : '');
+        li.id = `employee-item-${emp._id}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'employee-avatar';
+        avatar.textContent = emp.firstName[0] + (emp.lastName ? emp.lastName[0] : '');
+        
+        const info = document.createElement('div');
+        info.className = 'employee-info';
+        
+        let counterHtml = '';
+        if (unreadMessages[emp._id] && unreadMessages[emp._id] > 0) {
+          counterHtml = `<div class="unread-counter" id="counter-${emp._id}">📬 ${unreadMessages[emp._id]} mensaje${unreadMessages[emp._id] > 1 ? 's' : ''} sin responder</div>`;
+        }
+        
+        info.innerHTML = `
+          <div class="employee-name">${emp.firstName} ${emp.lastName}</div>
+          <div class="employee-status">👤 Empleado</div>
+          ${counterHtml}
+        `;
+        
+        li.appendChild(avatar);
+        li.appendChild(info);
+        
+        // Mostrar badge si hay mensajes sin leer
+        if (unreadMessages[emp._id] && unreadMessages[emp._id] > 0) {
+          const badge = document.createElement('div');
+          badge.className = 'unread-badge';
+          badge.id = `unread-${emp._id}`;
+          badge.textContent = unreadMessages[emp._id] > 9 ? '9+' : unreadMessages[emp._id];
+          li.appendChild(badge);
+        }
+        
+        li.addEventListener('click', () => openChat(emp._id, emp.firstName + ' ' + emp.lastName, emp.email));
+        employeeList.appendChild(li);
+      });
+    }
+
+    // === ABRIR CHAT ===
+    async function openChat(employeeId, fullName, email) {
+      if (openChats[employeeId]) {
+        switchToChat(employeeId);
+        return;
+      }
+
+      // Si no hay email, buscarlo en allEmployees
+      if (!email) {
+        const employee = allEmployees.find(e => e._id === employeeId);
+        if (employee && employee.email) {
+          email = employee.email;
+        }
+      }
+
+      // Si aún no hay email, intentar obtenerlo del servidor
+      if (!email) {
+        try {
+          const res = await fetch(`/api/current-employee`);
+          // En vez de eso, vamos a hacer que sea más directo
+          console.log('⚠️ Email no encontrado en allEmployees, intentando obtener del servidor...');
+        } catch (err) {
+          console.error('Error obteniendo email:', err);
+        }
+      }
+
+      // Si no tiene email, mostrar un placeholder
+      const displayEmail = email || '📧 Email no disponible';
+      const displayName = fullName || 'Empleado';
+
+      // Crear nueva pestaña
+      const tabId = `tab-${employeeId}`;
+      const panelId = `panel-${employeeId}`;
+
+      // PESTAÑA
+      const tab = document.createElement('div');
+      tab.id = tabId;
+      tab.className = 'chat-tab active';
+      tab.innerHTML = `
+        ${displayName.split(' ')[0]}
+        <span class="close-tab" onclick="closeChat('${employeeId}')" title="Cerrar">×</span>
+      `;
+      
+      // Reemplazar placeholder si es el primer chat
+      if (Object.keys(openChats).length === 0) {
+        chatTabs.innerHTML = '';
+      }
+      chatTabs.appendChild(tab);
+
+      // PANEL
+      const panel = document.createElement('div');
+      panel.id = panelId;
+      panel.className = 'chat-panel active';
+      panel.innerHTML = `
+        <div class="chat-header">
+          <div class="chat-header-info">
+            <div class="chat-header-title">💬 ${displayName}</div>
+            <div class="chat-header-subtitle">${displayEmail}</div>
+          </div>
+          <div class="chat-header-actions">
+            <button id="logoutBtn" onclick="logout()" title="Cerrar sesión">🚪 Logout</button>
+            <button onclick="minimizeChat('${employeeId}')">−</button>
+          </div>
+        </div>
+        <div class="chat-box" id="chatBox-${employeeId}"></div>
+        <form class="chat-form" id="chatForm-${employeeId}">
+          <textarea id="chatInput-${employeeId}" placeholder="Escribe un mensaje..." rows="2" required></textarea>
+          <label for="imageInput-${employeeId}" class="image-upload">📷
+            <input type="file" id="imageInput-${employeeId}" accept="image/*">
+          </label>
+          <button type="submit">▶</button>
+        </form>
+      `;
+      chatPanels.appendChild(panel);
+
+      // Guardar referencia
+      openChats[employeeId] = {
+        name: displayName,
+        email: displayEmail,
+        panel: panel,
+        tab: tab,
+        chatBox: panel.querySelector(`#chatBox-${employeeId}`),
+        form: panel.querySelector(`#chatForm-${employeeId}`),
+        input: panel.querySelector(`#chatInput-${employeeId}`),
+        imageInput: panel.querySelector(`#imageInput-${employeeId}`),
+        messages: [],
+        unreadCount: 0
+      };
+
+      // Cargar mensajes
+      await loadMessages(employeeId);
+      
+      // Limpiar contador de mensajes sin leer cuando se abre el chat
+      unreadMessages[employeeId] = 0;
+      updateUnreadBadge(employeeId);
+      updateEmployeeItemInList(employeeId);
+
+      // Event listener del formulario
+      openChats[employeeId].form.addEventListener('submit', (e) => sendMessage(e, employeeId));
+
+      // Unirse a sala Socket.IO
+      socket.emit('joinRoom', { userId: employeeId, role: 'admin' });
+
+      renderEmployeeList();
+    }
+
+    // === CARGAR MENSAJES ===
+    async function loadMessages(employeeId) {
+      try {
+        console.log(`📨 Cargando mensajes para empleado: ${employeeId}`);
+        const res = await fetch(`/chat/convo/${employeeId}`);
+        const messages = await res.json();
+        
+        console.log(`📨 Respuesta del servidor:`, messages);
+        console.log(`📊 Total de mensajes recibidos: ${messages.length}`);
+        
+        openChats[employeeId].messages = messages;
+        const chatBox = openChats[employeeId].chatBox;
+        chatBox.innerHTML = '';
+
+        if (!messages || messages.length === 0) {
+          console.log('ℹ️ No hay mensajes aún');
+          chatBox.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Sin mensajes aún</div>';
+        } else {
+          console.log(`✅ Renderizando ${messages.length} mensajes`);
+          messages.forEach((msg, idx) => {
+            console.log(`📝 Mensaje ${idx}:`, msg);
+            renderMessage(employeeId, msg.sender === 'office' ? 'admin' : 'employee', msg.text, msg.imageUrl, msg.at);
+          });
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (err) {
+        console.error('❌ Error cargando mensajes:', err);
+        openChats[employeeId].chatBox.innerHTML = '<div style="color: red; padding: 20px;">Error al cargar mensajes</div>';
+      }
+    }
+
+    // === RENDERIZAR MENSAJE ===
+    function renderMessage(employeeId, sender, text = '', imageUrl = '', timestamp) {
+      const chatBox = openChats[employeeId].chatBox;
+      const div = document.createElement('div');
+      div.className = 'msg ' + (sender === 'admin' ? 'sent' : 'received');
+      
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.innerHTML = `<strong>${sender === 'admin' ? '🛠️ Tú' : '🧑‍💼 ' + openChats[employeeId].name.split(' ')[0]}:</strong> ${escapeHtml(text)}`;
+      
+      if (imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.className = 'msg-image';
+        img.style.marginTop = '8px';
+        bubble.appendChild(img);
+      }
+      
+      div.appendChild(bubble);
+      
+      if (timestamp) {
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'msg-time';
+        timeDiv.textContent = new Date(timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        div.appendChild(timeDiv);
+      }
+      
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // === ENVIAR MENSAJE ===
+    async function sendMessage(e, employeeId) {
+      e.preventDefault();
+      
+      const input = openChats[employeeId].input;
+      const imageInput = openChats[employeeId].imageInput;
+      const text = input.value.trim();
+      const file = imageInput.files[0];
+
+      let imageUrl = '';
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('chatImage', file);
+
+        try {
+          const res = await fetch('/upload-chat-image', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            imageUrl = data.url;
+          } else {
+            alert('❌ Error al subir imagen');
+            return;
+          }
+        } catch (err) {
+          console.error('Error subiendo imagen:', err);
+          alert('Error al subir imagen');
+          return;
+        }
+      }
+
+      if (!text && !imageUrl) return;
+
+      socket.emit('sendMessage', {
+        from: 'office',
+        to: employeeId,
+        text: text || '',
+        imageUrl: imageUrl || ''
+      });
+
+      renderMessage(employeeId, 'admin', text, imageUrl, new Date());
+      
+      // Limpiar contador cuando el admin responde
+      unreadMessages[employeeId] = 0;
+      updateUnreadBadge(employeeId);
+      updateEmployeeItemInList(employeeId);
+      
+      input.value = '';
+      imageInput.value = '';
+    }
+
+    // === CAMBIAR ENTRE CHATS ===
+    function switchToChat(employeeId) {
+      // Desactivar todos
+      Object.keys(openChats).forEach(id => {
+        openChats[id].panel.classList.remove('active');
+        openChats[id].tab.classList.remove('active');
+      });
+
+      // Activar seleccionado
+      openChats[employeeId].panel.classList.add('active');
+      openChats[employeeId].tab.classList.add('active');
+      openChats[employeeId].input.focus();
+    }
+
+    // === CERRAR CHAT ===
+    function closeChat(employeeId) {
+      if (openChats[employeeId]) {
+        openChats[employeeId].panel.remove();
+        openChats[employeeId].tab.remove();
+        delete openChats[employeeId];
+        renderEmployeeList();
+
+        // Si no hay chats abiertos, mostrar placeholder
+        if (Object.keys(openChats).length === 0) {
+          chatTabs.innerHTML = '<div style="padding: 10px 15px; color: #7f8c8d; font-size: 0.9em;">Selecciona un empleado para empezar</div>';
+          chatPanels.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size: 3em; margin-bottom: 10px;">💬</div>
+              <h3>Bienvenido al Panel de Chat</h3>
+              <p>Selecciona un empleado de la lista para comenzar una conversación</p>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // === MINIMIZAR CHAT ===
+    function minimizeChat(employeeId) {
+      if (openChats[employeeId]) {
+        openChats[employeeId].panel.classList.remove('active');
+        openChats[employeeId].tab.classList.remove('active');
+      }
+    }
+
+    // === BÚSQUEDA ===
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      filteredEmployees = allEmployees.filter(emp =>
+        `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(query)
+      );
+      renderEmployeeList();
+    });
+
+    // === SOCKET.IO - RECIBIR MENSAJES ===
+    socket.on('receiveMessage', (msg) => {
+      console.log('📨 Mensaje Socket.IO recibido:', msg);
+      
+      // Determinar de quién es el mensaje
+      let employeeId = null;
+      
+      if (msg.sender === 'office') {
+        // Mensaje del admin a un empleado
+        employeeId = msg.to;
+      } else {
+        // Mensaje de un empleado al admin
+        employeeId = msg.sender;
+      }
+
+      console.log(`📨 Procesando mensaje para chat de empleado: ${employeeId}`);
+
+      if (openChats[employeeId]) {
+        // Si el chat está abierto, renderizar el mensaje
+        const senderType = msg.sender === 'office' ? 'admin' : 'employee';
+        renderMessage(employeeId, senderType, msg.text, msg.imageUrl, msg.at);
+        console.log(`✅ Mensaje renderizado en chat abierto`);
+      } else {
+        // Si el chat no está abierto, incrementar contador de no leídos
+        console.log(`ℹ️ Chat no abierto, incrementando contador`);
+        
+        if (msg.sender !== 'office') {
+          // Solo contar mensajes de empleados al admin (no mensajes que el admin envía)
+          unreadMessages[employeeId] = (unreadMessages[employeeId] || 0) + 1;
+          updateUnreadBadge(employeeId);
+          updateEmployeeItemInList(employeeId);
+        }
+        
+        // Encontrar el nombre del empleado
+        const employee = allEmployees.find(e => e._id === employeeId);
+        const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : 'Empleado';
+        const messagePreview = msg.text.substring(0, 60) + (msg.text.length > 60 ? '...' : '');
+        
+        showMessageNotification(employeeName, messagePreview, employeeId);
+      }
+    });
+
+    // === KEEP-ALIVE: Responder a heartbeats del servidor ===
+    socket.on('heartbeat', (data) => {
+      console.log('💓 Heartbeat recibido del servidor');
+      // El simple hecho de recibir mantiene la conexión activa
+      // Socket.IO maneja automáticamente la respuesta
+    });
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // === LOGOUT FUNCTION ===
+    function logout() {
+      if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        socket.disconnect();
+        window.location.href = '/logout';
+      }
+    }
+
+    // Inicializar
+    loadEmployees();
+
+    // Registrar al admin en Socket.IO
+    socket.emit('registerUser', 'office');
+    console.log('✅ Admin registrado como "office"');
+  </script>
+</body>
+</html>

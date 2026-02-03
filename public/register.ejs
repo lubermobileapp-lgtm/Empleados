@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de Empleado - Luber</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+
+  <!-- CARD -->
+  <div class="form-container">
+
+    <div class="form-header">
+      <img src="/images/logo.png" alt="Luber Logo" class="form-logo">
+      <h1>Registro de Empleado</h1>
+    </div>
+
+    <% if (error) { %>
+      <p class="form-error"><%= error %></p>
+    <% } %>
+
+    <!-- STEPPER -->
+    <div class="stepper" aria-label="Progreso del registro">
+      <div class="s active" data-indicator="0">
+        <div class="dot">1</div>
+        <div class="meta">
+          <div class="title">Personal</div>
+          <div class="hint">Tu info básica</div>
+        </div>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="s" data-indicator="1">
+        <div class="dot">2</div>
+        <div class="meta">
+          <div class="title">Trabajo</div>
+          <div class="hint">Dirección y fecha</div>
+        </div>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="s" data-indicator="2">
+        <div class="dot">3</div>
+        <div class="meta">
+          <div class="title">Documentos</div>
+          <div class="hint">Sube archivos</div>
+        </div>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="s" data-indicator="3">
+        <div class="dot">4</div>
+        <div class="meta">
+          <div class="title">Seguridad</div>
+          <div class="hint">Password y consentimiento</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form class="form-grid multi-step" action="/register" method="POST" enctype="multipart/form-data" novalidate>
+      <div class="steps">
+
+        <!-- STEP 1 -->
+        <section class="step" data-step="1">
+          <h2 class="step-title">Personal</h2>
+
+          <div class="field">
+            <label for="firstName">First Name</label>
+            <input id="firstName" name="firstName" required autocomplete="given-name" placeholder="John">
+          </div>
+
+          <div class="field">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" name="lastName" required autocomplete="family-name" placeholder="Doe">
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" required autocomplete="email" placeholder="john@correo.com" inputmode="email">
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" required autocomplete="tel" placeholder="(555) 123-4567" inputmode="tel">
+            <div class="help">Usa un número válido para contactarte.</div>
+          </div>
+
+          <div class="field">
+            <label for="dob">Date of Birth</label>
+            <input id="dob" type="date" name="dob" required autocomplete="bday">
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn prev" disabled>Anterior</button>
+            <button type="button" class="btn primary next">Siguiente</button>
+          </div>
+        </section>
+
+        <!-- STEP 2 -->
+        <section class="step" data-step="2" hidden>
+          <h2 class="step-title">Trabajo</h2>
+
+          <div class="field">
+            <label for="address">Address</label>
+            <input id="address" name="address" required autocomplete="street-address" placeholder="123 Main St">
+          </div>
+
+          <div class="field">
+            <label for="state">State of Residence</label>
+            <select id="state" name="state" required autocomplete="address-level1">
+              <option value="">Select your state</option>
+              <option value="FL">Florida</option>
+              <option value="TX">Texas</option>
+              <option value="CA">California</option>
+              <option value="NY">New York</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="startDate">Start Date</label>
+            <input id="startDate" type="date" name="startDate" required>
+          </div>
+
+          <div class="field checkbox-field">
+            <input id="dispatchAccess" type="checkbox" name="dispatchAccess">
+            <label for="dispatchAccess">¿Es para Dispatch?</label>
+            <div class="help">Marca esta casilla si el empleado tiene acceso a dispatch.</div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn prev">Anterior</button>
+            <button type="button" class="btn primary next">Siguiente</button>
+          </div>
+        </section>
+
+        <!-- STEP 3 -->
+        <section class="step" data-step="3" hidden>
+          <h2 class="step-title">Documentos y Seguro Social</h2>
+
+          <!-- SSN MANUAL ENTRY -->
+          <details class="doc-group" open>
+            <summary>Seguro Social (Ingresa manualmente)</summary>
+            <div class="field">
+              <label for="ssnManual">Social Security Number (SSN)</label>
+              <input id="ssnManual" type="text" name="ssn" placeholder="XXX-XX-XXXX" maxlength="11" required 
+                pattern="\d{3}-\d{2}-\d{4}" title="Formato: XXX-XX-XXXX">
+              <div class="help">Ingresa tu número de seguro social en formato XXX-XX-XXXX</div>
+            </div>
+          </details>
+
+          <details class="doc-group" open>
+            <summary>Documentos (sube los archivos requeridos)</summary>
+
+            <div class="doc-grid">
+              <label for="profileImage">Profile Image</label>
+              <input id="profileImage" type="file" name="profileImage" accept="image/*" required>
+
+              <label for="ssnDoc">Social Security Document (PDF/JPG)</label>
+              <input id="ssnDoc" type="file" name="ssnDoc" accept=".pdf,.jpg,.jpeg" required>
+
+              <label for="certDoc">Certification (PDF/JPG)</label>
+              <input id="certDoc" type="file" name="certDoc" accept=".pdf,.jpg,.jpeg" required>
+
+              <label for="resumeDoc">Resume (PDF)</label>
+              <input id="resumeDoc" type="file" name="resumeDoc" accept=".pdf" required>
+            </div>
+          </details>
+
+          <div class="actions">
+            <button type="button" class="btn prev">Anterior</button>
+            <button type="button" class="btn primary next">Siguiente</button>
+          </div>
+        </section>
+
+        <!-- STEP 4 -->
+        <section class="step" data-step="4" hidden>
+          <h2 class="step-title">Seguridad</h2>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required autocomplete="new-password" placeholder="••••••••">
+            <div class="help">Mínimo recomendado: 8+ caracteres.</div>
+          </div>
+
+          <div class="consent">
+            <input id="consent" type="checkbox" name="consent" required>
+            <label for="consent">
+              I consent to the use of my personal information for employment and tax documentation purposes.
+            </label>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn prev">Anterior</button>
+            <button class="btn primary" type="submit" id="submitBtn">Registrarse</button>
+          </div>
+
+          <!-- LOADING INDICATOR -->
+          <div id="loadingIndicator" class="loading-indicator" hidden>
+            <div class="spinner"></div>
+            <p>Registrando tu información<span class="dots"></span></p>
+          </div>
+        </section>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- STEP LOGIC -->
+  <script>
+    (function(){
+      const form = document.querySelector('.multi-step');
+      const steps = Array.from(form.querySelectorAll('.step'));
+      const stepperItems = Array.from(document.querySelectorAll('.stepper .s'));
+      const prevButtons = Array.from(form.querySelectorAll('.btn.prev'));
+      const submitBtn = document.getElementById('submitBtn');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      let idx = 0;
+
+      function markStepper(i){
+        stepperItems.forEach((item, si) => {
+          item.classList.remove('active','done');
+          if (si < i) item.classList.add('done');
+          if (si === i) item.classList.add('active');
+        });
+      }
+
+      function showStep(i){
+        steps.forEach((s, si) => {
+          si === i ? s.removeAttribute('hidden') : s.setAttribute('hidden','');
+        });
+        idx = i;
+        markStepper(i);
+
+        prevButtons.forEach(btn => {
+          idx === 0 ? btn.setAttribute('disabled','') : btn.removeAttribute('disabled');
+        });
+
+        steps[i].scrollIntoView({behavior:'smooth', block:'start'});
+      }
+
+      function validateStep(i){
+        const required = steps[i].querySelectorAll('input[required],select[required],textarea[required]');
+        for(const el of required){
+          if(!el.checkValidity()){
+            el.reportValidity();
+            return false;
+          }
+        }
+        return true;
+      }
+
+      form.addEventListener('click', e => {
+        if(e.target.classList.contains('next')){
+          if(validateStep(idx) && idx < steps.length - 1) showStep(idx + 1);
+        }
+        if(e.target.classList.contains('prev')){
+          if(idx > 0) showStep(idx - 1);
+        }
+      });
+
+      form.addEventListener('submit', e => {
+        if(!validateStep(idx)) {
+          e.preventDefault();
+          return;
+        }
+        
+        // Show loading indicator
+        loadingIndicator.removeAttribute('hidden');
+        submitBtn.setAttribute('disabled', '');
+        
+        // Animate dots
+        const dotsElement = document.querySelector('.dots');
+        let dotCount = 0;
+        const dotInterval = setInterval(() => {
+          dotCount = (dotCount + 1) % 4;
+          dotsElement.textContent = '.'.repeat(dotCount);
+        }, 500);
+        
+        // Store interval ID to clear on completion
+        form.dataset.dotInterval = dotInterval;
+      });
+
+      showStep(0);
+    })();
+  </script>
+
+</body>
+</html>

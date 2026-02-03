@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Schedule Card Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --primary-light: #f0f4ff;
+            --secondary: #764ba2;
+            --success: #1db15a;
+            --success-dark: #17944f;
+            --text-primary: #0f1419;
+            --text-secondary: #3a3f47;
+            --text-tertiary: #6b7280;
+            --text-quaternary: #9ca3af;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --bg-light: #f9fafb;
+            --bg-lighter: #f3f4f6;
+            --bg-white: #ffffff;
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 12px 32px 0 rgba(0, 0, 0, 0.15);
+            --shadow-xl: 0 20px 48px 0 rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== SCHEDULE CARD STYLES ===== */
+        .schedule-card {
+            background: var(--bg-white);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+            margin-bottom: 1.75rem;
+            position: relative;
+        }
+
+        .schedule-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+
+        .schedule-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        /* ===== CARD HEADER (COLLAPSED VIEW) ===== */
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(118, 75, 162, 0.03) 100%);
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            user-select: none;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto auto 2rem;
+            gap: 2.5rem;
+            align-items: center;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .schedule-card:hover .card-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.04) 100%);
+        }
+
+        .expand-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+            transition: var(--transition-fast);
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .schedule-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Date */
+        .header-date {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 110px;
+        }
+
+        .date-badge {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0.5rem 0.9rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .date-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* Time */
+        .header-time {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 140px;
+        }
+
+        .time-display {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .time-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* Customer */
+        .header-customer {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 180px;
+        }
+
+        .customer-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .customer-type {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* Vehicle */
+        .header-vehicle {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 140px;
+        }
+
+        .vehicle-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        .vehicle-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* Price */
+        .header-price {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 110px;
+            text-align: right;
+        }
+
+        .price-value {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--success);
+            letter-spacing: -0.4px;
+        }
+
+        .price-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* Engine */
+        .header-engine {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 105px;
+        }
+
+        .engine-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        .engine-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* Address - Now in better position */
+        .header-address {
+            display: none;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 220px;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--border-light);
+        }
+
+        .address-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            line-height: 1.35;
+            letter-spacing: -0.2px;
+        }
+
+        .address-text:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .address-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        /* ===== EXPANDED CONTENT ===== */
+        .card-content {
+            display: none;
+            padding: 1.5rem 1.75rem;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .schedule-card.expanded .card-content {
+            display: grid;
+            animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            align-items: start;
+            position: relative;
+            padding: 1.5rem 1.75rem;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .schedule-card.expanded .card-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.205) 0%, rgba(255, 255, 255, 0.815) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== VEHICLE IMAGE ===== */
+        .vehicle-image-section {
+            display: none;
+        }
+
+        .vehicle-image {
+            display: none;
+        }
+
+        .vehicle-image img {
+            display: none;
+        }
+
+        /* ===== DETAILS GRID ===== */
+        .details-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-self: start;
+            position: relative;
+            z-index: 2;
+        }
+
+        .details-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .details-right {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ===== SPECS GRID ===== */
+        .specs-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0) 0%, rgba(118, 75, 162, 0) 100%);
+            padding: 1.25rem;
+            border-radius: 1.125rem;
+            border: 1px solid rgba(102, 126, 234, 0);
+            backdrop-filter: blur(10px);
+        }
+
+        .specs-title {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--primary);
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.60);
+            padding: 0.875rem;
+            border-radius: 0.875rem;
+            border: 1px solid rgba(102, 126, 234, 0.05);
+            transition: var(--transition-fast);
+            backdrop-filter: blur(8px);
+        }
+
+        .spec-item:hover {
+            background: rgba(240, 244, 255, 0.75);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .spec-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-quaternary);
+        }
+
+        .spec-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.2px;
+        }
+
+        .filter-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.5rem 0.875rem;
+            border-radius: 0.625rem;
+            background: rgba(249, 250, 251, 0.65);
+            border: 1px solid rgba(102, 126, 234, 0);
+            width: fit-content;
+            backdrop-filter: blur(6px);
+        }
+
+        .filter-status.needed {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.08);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+
+        .filter-status.good {
+            color: var(--success);
+            background: rgba(29, 177, 90, 0.08);
+            border-color: rgba(29, 177, 90, 0.2);
+        }
+
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .status-indicator.needed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-indicator.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* ===== INFO BLOCKS ===== */
+        .info-blocks {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .info-block {
+            background: rgba(255, 255, 255, 0.65);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-light);
+            border-left: 3px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-xs);
+            backdrop-filter: blur(8px);
+        }
+
+        .info-block:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .info-block.location {
+            grid-column: 1;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0) 0%, rgba(118, 75, 162, 0) 100%);
+            border: 2px solid var(--primary);
+            border-left: 4px solid var(--primary);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-block.price {
+            grid-column: 2;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0) 0%, rgba(118, 75, 162, 0) 100%);
+            border: 2px solid var(--primary);
+            border-left: 4px solid var(--primary);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-quaternary);
+        }
+
+        .info-block.price .info-label {
+            color: var(--primary);
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.45;
+            letter-spacing: -0.2px;
+        }
+
+        .info-block.location .info-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            border-bottom: 2px solid transparent;
+        }
+
+        .info-block.location .info-value:hover {
+            text-decoration: underline;
+            color: var(--primary-dark);
+        }
+
+        .location-link {
+            color: inherit;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .location-link:hover {
+            text-decoration: underline;
+            color: var(--primary-dark);
+        }
+
+        .info-block.price .info-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.4px;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            grid-column: 1 / -1;
+            position: relative;
+            z-index: 10;
+        }
+
+        .btn {
+            padding: 0.85rem 1.75rem;
+            border: none;
+            border-radius: 0.875rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 4px 15px rgba(29, 177, 90, 0.25);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(29, 177, 90, 0.35);
+        }
+
+        .btn-success:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1400px) {
+            .card-header {
+                grid-template-columns: auto auto 1fr auto auto 2rem;
+                gap: 2rem;
+                padding: 1.25rem 1.75rem;
+            }
+
+            .header-address {
+                display: none;
+            }
+
+            .schedule-card.expanded .card-content {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .vehicle-image-section {
+                min-width: auto;
+            }
+
+            .vehicle-image {
+                max-width: 350px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .card-header {
+                grid-template-columns: auto auto 1fr auto 2rem;
+                gap: 1.5rem;
+                padding: 1.25rem 1.5rem;
+            }
+
+            .header-date,
+            .header-time {
+                min-width: auto;
+            }
+
+            .details-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .info-blocks {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .schedule-card.expanded .card-content {
+                padding: 2rem;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+
+            .card-header {
+                grid-template-columns: auto 1fr auto;
+                gap: 1rem;
+                padding: 1.25rem 1.25rem;
+                font-size: 0.95rem;
+            }
+
+            .header-vehicle,
+            .header-engine,
+            .header-price {
+                display: none;
+            }
+
+            .header-date {
+                min-width: 85px;
+            }
+
+            .date-badge {
+                padding: 0.45rem 0.75rem;
+                font-size: 0.75rem;
+            }
+
+            .header-customer {
+                min-width: auto;
+            }
+
+            .customer-name {
+                font-size: 0.95rem;
+            }
+
+            .time-display {
+                font-size: 0.85rem;
+            }
+
+            .schedule-card.expanded .card-content {
+                padding: 1.5rem;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .vehicle-image {
+                width: 100%;
+                max-width: 380px;
+                margin: 0 auto;
+                aspect-ratio: 1.5;
+            }
+
+            .vehicle-image-section {
+                min-width: auto;
+            }
+
+            .details-left,
+            .details-right {
+                gap: 1.5rem;
+            }
+
+            .specs-grid,
+            .info-blocks {
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .card-header {
+                grid-template-columns: auto 1fr auto;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .header-customer {
+                min-width: auto;
+            }
+
+            .customer-name {
+                font-size: 0.9rem;
+            }
+
+            .expand-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .header-date,
+            .header-time {
+                gap: 0.25rem;
+            }
+
+            .date-badge {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .time-display {
+                font-size: 0.8rem;
+            }
+
+            .schedule-card.expanded .card-content {
+                padding: 1.25rem 1rem;
+                gap: 1.25rem;
+            }
+
+            .vehicle-image {
+                height: auto;
+                max-width: 100%;
+            }
+
+            .specs-grid,
+            .info-blocks {
+                gap: 0.75rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 0.7rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .spec-label,
+            .info-label {
+                font-size: 0.6rem;
+            }
+
+            .spec-value,
+            .info-value {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Utility */
+        .text-muted {
+            color: var(--text-tertiary);
+        }
+
+        /* Page Title */
+        .page-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.8px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="margin-bottom: 3rem;">
+            <h1 class="page-title">Modern Schedule Card Design</h1>
+            <p class="page-subtitle">Professional employee work schedule cards with smooth interactions</p>
+        </div>
+
+        <!-- Card 1 - Expanded View -->
+        <div class="schedule-card expanded" id="card1">
+            <!-- COLLAPSED VIEW - Horizontal Layout -->
+            <div class="card-header" onclick="toggleCard('card1')">
+                <!-- Date -->
+                <div class="header-date">
+                    <div class="date-badge">Jan 29, 2026</div>
+                    <div class="date-label">Date</div>
+                </div>
+
+                <!-- Time -->
+                <div class="header-time">
+                    <div class="time-display">9:00 AM - 5:00 PM</div>
+                    <div class="time-label">Hours</div>
+                </div>
+
+                <!-- Customer -->
+                <div class="header-customer">
+                    <div class="customer-name">Premium Auto Care</div>
+                    <div class="customer-type">Account</div>
+                </div>
+
+                <!-- Vehicle -->
+                <div class="header-vehicle">
+                    <div class="vehicle-name">Nissan GTR R35</div>
+                    <div class="vehicle-label">Vehicle</div>
+                </div>
+
+                <!-- Price -->
+                <div class="header-price">
+                    <div class="price-value">$280</div>
+                    <div class="price-label">Price</div>
+                </div>
+
+                <!-- Engine -->
+                <div class="header-engine">
+                    <div class="engine-value">3.8L Twin</div>
+                    <div class="engine-label">Engine</div>
+                </div>
+
+                <!-- Address -->
+                <div class="header-address">
+                    <div class="address-label">Service Location</div>
+                    <a class="address-text" href="#map">91 High St, Winter Haven, FL 33880</a>
+                </div>
+
+                <!-- Expand Icon -->
+                <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+            </div>
+
+            <!-- EXPANDED VIEW -->
+            <div class="card-content">
+                <!-- Vehicle Image -->
+                <div class="vehicle-image-section">
+                    <div class="vehicle-image">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 130px; height: 130px; color: #d1d5db;">
+                            <rect x="3" y="5" width="18" height="12" rx="2"></rect>
+                            <circle cx="7" cy="17" r="2"></circle>
+                            <circle cx="17" cy="17" r="2"></circle>
+                            <path d="M3 7h18"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="details-section">
+                    <!-- Left Column -->
+                    <div class="details-left">
+                        <!-- Specifications -->
+                        <div class="specs-group">
+                            <div class="specs-title">Specifications</div>
+                            <div class="specs-grid">
+                                <div class="spec-item">
+                                    <div class="spec-label">Oil Type</div>
+                                    <div class="spec-value">Full Synthetic</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Engine</div>
+                                    <div class="spec-value">3.8L Twin</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Year</div>
+                                    <div class="spec-value">2021</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Plate (Last 3)</div>
+                                    <div class="spec-value">GTR</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="details-right">
+                        <!-- Maintenance Status -->
+                        <div class="specs-group">
+                            <div class="specs-title">Maintenance</div>
+                            <div class="specs-grid">
+                                <div class="spec-item">
+                                    <div class="spec-label">Air Filter</div>
+                                    <div class="filter-status good">
+                                        <span class="status-indicator good">✓</span>
+                                        Good
+                                    </div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Cabin Filter</div>
+                                    <div class="filter-status needed">
+                                        <span class="status-indicator needed">✕</span>
+                                        Needed
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Info -->
+                        <div class="info-blocks">
+                            <div class="info-block location">
+                                <div class="info-label">📍 Location</div>
+                                <a href="https://maps.google.com/?q=91%20High%20St%20Winter%20Haven%20FL%2033880" target="_blank" class="info-value location-link">91 High St, Winter Haven, FL 33880 ✓</a>
+                            </div>
+                            <div class="info-block price">
+                                <div class="info-label">💰 Price</div>
+                                <div class="info-value">$37.50</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-success">✓ Accept Offer</button>
+                    <button class="btn btn-primary">📊 Dispatch</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 - Collapsed View -->
+        <div class="schedule-card" id="card2">
+            <!-- COLLAPSED VIEW -->
+            <div class="card-header" onclick="toggleCard('card2')">
+                <!-- Date -->
+                <div class="header-date">
+                    <div class="date-badge">Jan 30, 2026</div>
+                    <div class="date-label">Date</div>
+                </div>
+
+                <!-- Time -->
+                <div class="header-time">
+                    <div class="time-display">8:00 AM - 4:00 PM</div>
+                    <div class="time-label">Hours</div>
+                </div>
+
+                <!-- Customer -->
+                <div class="header-customer">
+                    <div class="customer-name">Luxury Motors LLC</div>
+                    <div class="customer-type">Account</div>
+                </div>
+
+                <!-- Vehicle -->
+                <div class="header-vehicle">
+                    <div class="vehicle-name">Tesla Model S</div>
+                    <div class="vehicle-label">Vehicle</div>
+                </div>
+
+                <!-- Price -->
+                <div class="header-price">
+                    <div class="price-value">$320</div>
+                    <div class="price-label">Price</div>
+                </div>
+
+                <!-- Engine -->
+                <div class="header-engine">
+                    <div class="engine-value">Electric</div>
+                    <div class="engine-label">Type</div>
+                </div>
+
+                <!-- Address -->
+                <div class="header-address">
+                    <div class="address-label">Service Location</div>
+                    <a class="address-text" href="#map">455 Park Ave, Miami, FL 33139</a>
+                </div>
+
+                <!-- Expand Icon -->
+                <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+            </div>
+
+            <!-- EXPANDED VIEW -->
+            <div class="card-content">
+                <!-- Vehicle Image -->
+                <div class="vehicle-image-section">
+                    <div class="vehicle-image">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 130px; height: 130px; color: #d1d5db;">
+                            <rect x="3" y="5" width="18" height="12" rx="2"></rect>
+                            <circle cx="7" cy="17" r="2"></circle>
+                            <circle cx="17" cy="17" r="2"></circle>
+                            <path d="M3 7h18"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="details-section">
+                    <!-- Left Column -->
+                    <div class="details-left">
+                        <!-- Specifications -->
+                        <div class="specs-group">
+                            <div class="specs-title">Specifications</div>
+                            <div class="specs-grid">
+                                <div class="spec-item">
+                                    <div class="spec-label">Power Type</div>
+                                    <div class="spec-value">Electric</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Battery</div>
+                                    <div class="spec-value">100 kWh</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Year</div>
+                                    <div class="spec-value">2023</div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Plate (Last 3)</div>
+                                    <div class="spec-value">TSL</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="details-right">
+                        <!-- Maintenance Status -->
+                        <div class="specs-group">
+                            <div class="specs-title">Maintenance</div>
+                            <div class="specs-grid">
+                                <div class="spec-item">
+                                    <div class="spec-label">Battery Health</div>
+                                    <div class="filter-status good">
+                                        <span class="status-indicator good">✓</span>
+                                        Excellent
+                                    </div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-label">Brake Fluid</div>
+                                    <div class="filter-status good">
+                                        <span class="status-indicator good">✓</span>
+                                        Good
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Info -->
+                        <div class="info-blocks">
+                            <div class="info-block location">
+                                <div class="info-label">📍 Location</div>
+                                <div class="info-value">455 Park Ave, Miami, FL 33139</div>
+                            </div>
+                            <div class="info-block price">
+                                <div class="info-label">💰 Price</div>
+                                <div class="info-value">$47.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-success">✓ Accept Offer</button>
+                    <button class="btn btn-primary">📊 Dispatch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            card.classList.toggle('expanded');
+            
+            // Set background image when expanding
+            if (card.classList.contains('expanded')) {
+                const img = card.querySelector('.vehicle-image img');
+                if (img && img.src) {
+                    const cardContent = card.querySelector('.card-content');
+                    cardContent.style.backgroundImage = `url('${img.src}')`;
+                }
+            } else {
+                // Remove background when collapsing
+                const cardContent = card.querySelector('.card-content');
+                cardContent.style.backgroundImage = 'none';
+            }
+        }
+        
+        // Open Google Maps with address
+        function openGoogleMaps(address) {
+            const encodedAddress = encodeURIComponent(address);
+            const url = `https://maps.google.com/?q=${encodedAddress}`;
+            window.open(url, '_blank');
+        }
+        
+        // Initialize background images on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.schedule-card.expanded').forEach(card => {
+                const img = card.querySelector('.vehicle-image img');
+                if (img && img.src) {
+                    const cardContent = card.querySelector('.card-content');
+                    cardContent.style.backgroundImage = `url('${img.src}')`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

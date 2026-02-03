@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Chat - Luber</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 { color: #4ec9b0; }
+    h2 { color: #569cd6; margin-top: 30px; }
+    .container {
+      background: #252526;
+      padding: 20px;
+      border-radius: 4px;
+      margin: 20px 0;
+      border-left: 4px solid #007acc;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      background: #3e3e42;
+      color: #d4d4d4;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    input {
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+      background: #007acc;
+      border: none;
+      width: 100%;
+    }
+    button:hover {
+      background: #1084d7;
+    }
+    .output {
+      background: #1e1e1e;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border: 1px solid #3e3e42;
+      max-height: 500px;
+      overflow-y: auto;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .success { color: #4ec9b0; }
+    .error { color: #f48771; }
+    .info { color: #569cd6; }
+    .warning { color: #dcdcaa; }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Debug - Chat Luber</h1>
+
+  <div class="container">
+    <h2>📋 Obtener Lista de Empleados</h2>
+    <button onclick="getEmployees()">Cargar Empleados</button>
+    <div class="output" id="employeesOutput"></div>
+  </div>
+
+  <div class="container">
+    <h2>💬 Obtener Conversación</h2>
+    <input type="text" id="empIdInput" placeholder="ID del Empleado (ej: 507f1f77bcf86cd799439011)">
+    <button onclick="getConversation()">Cargar Conversación</button>
+    <div class="output" id="conversationOutput"></div>
+  </div>
+
+  <div class="container">
+    <h2>🗄️ Ver Todos los Chats en MongoDB</h2>
+    <button onclick="getAllChats()">Cargar Todos los Chats</button>
+    <div class="output" id="allChatsOutput"></div>
+  </div>
+
+  <script>
+    function log(element, type, title, data) {
+      const output = document.getElementById(element);
+      const timestamp = new Date().toLocaleTimeString();
+      let html = `<div class="${type}">[${timestamp}] <strong>${title}</strong></div>`;
+      if (data) {
+        html += `<pre><div class="info">${JSON.stringify(data, null, 2)}</div></pre>`;
+      }
+      output.innerHTML += html;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    async function getEmployees() {
+      try {
+        const res = await fetch('/api/chat/employees');
+        const data = await res.json();
+        log('employeesOutput', 'success', `✅ Empleados cargados (${data.length}):`, data);
+      } catch (err) {
+        log('employeesOutput', 'error', '❌ Error:', err.message);
+      }
+    }
+
+    async function getConversation() {
+      const empId = document.getElementById('empIdInput').value.trim();
+      if (!empId) return log('conversationOutput', 'warning', '⚠️ Ingresa un ID de empleado');
+
+      try {
+        const res = await fetch(`/chat/convo/${empId}`);
+        const data = await res.json();
+        log('conversationOutput', 'success', `✅ Conversación cargada (${data.length} mensajes):`, data);
+      } catch (err) {
+        log('conversationOutput', 'error', '❌ Error:', err.message);
+      }
+    }
+
+    async function getAllChats() {
+      try {
+        const res = await fetch('/api/debug/all-chats');
+        const data = await res.json();
+        log('allChatsOutput', 'success', `✅ Total de chats en BD: ${data.length}`, data);
+      } catch (err) {
+        log('allChatsOutput', 'error', '❌ Error:', err.message);
+      }
+    }
+  </script>
+</body>
+</html>

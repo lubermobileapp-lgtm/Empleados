@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Chat - Luber</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .log {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .log-entry.info { color: #0066cc; }
+    .log-entry.success { color: #00aa00; }
+    .log-entry.error { color: #cc0000; }
+    .log-entry.warning { color: #ff8800; }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    input {
+      width: 100%;
+      font-size: 14px;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .status {
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .status.connected { background: #d4edda; color: #155724; }
+    .status.disconnected { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test de Chat - Luber</h1>
+  
+  <div class="container">
+    <!-- ADMIN -->
+    <div class="panel">
+      <h2>👨‍💼 Admin (office)</h2>
+      <div class="status disconnected" id="adminStatus">Desconectado</div>
+      
+      <h3>Conectar</h3>
+      <button onclick="connectAdmin()">Conectar Admin</button>
+      
+      <h3>Empleado ID</h3>
+      <input type="text" id="adminEmpId" placeholder="ID del empleado para conectar">
+      <button onclick="adminOpenChat()">Abrir Chat con Empleado</button>
+      
+      <h3>Enviar Mensaje</h3>
+      <input type="text" id="adminMsgInput" placeholder="Escribe tu mensaje...">
+      <button onclick="adminSendMessage()">Enviar</button>
+      
+      <h3>Log</h3>
+      <div class="log" id="adminLog"></div>
+    </div>
+
+    <!-- EMPLOYEE -->
+    <div class="panel">
+      <h2>👤 Empleado</h2>
+      <div class="status disconnected" id="empStatus">Desconectado</div>
+      
+      <h3>Conectar</h3>
+      <button onclick="connectEmployee()">Conectar Empleado</button>
+      
+      <h3>Enviar Mensaje</h3>
+      <input type="text" id="empMsgInput" placeholder="Escribe tu mensaje...">
+      <button onclick="empSendMessage()">Enviar</button>
+      
+      <h3>Log</h3>
+      <div class="log" id="empLog"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let adminSocket = null;
+    let empSocket = null;
+    let empId = null;
+
+    function log(type, element, message) {
+      const logDiv = document.getElementById(element);
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function connectAdmin() {
+      adminSocket = io();
+      
+      adminSocket.on('connect', () => {
+        log('success', 'adminLog', '✅ Admin conectado al servidor');
+        document.getElementById('adminStatus').innerHTML = 'Conectado';
+        document.getElementById('adminStatus').className = 'status connected';
+      });
+
+      adminSocket.on('registerUser', () => {
+        log('info', 'adminLog', 'ℹ️ Admin registrado');
+      });
+
+      adminSocket.on('receiveMessage', (msg) => {
+        log('info', 'adminLog', `📨 Mensaje recibido: "${msg.text}" de ${msg.sender}`);
+      });
+
+      adminSocket.on('disconnect', () => {
+        log('error', 'adminLog', '❌ Admin desconectado');
+        document.getElementById('adminStatus').innerHTML = 'Desconectado';
+        document.getElementById('adminStatus').className = 'status disconnected';
+      });
+
+      // === KEEP-ALIVE: Responder a heartbeats del servidor ===
+      adminSocket.on('heartbeat', () => {
+        log('info', 'adminLog', '💓 Heartbeat recibido (servidor activo)');
+      });
+
+      log('info', 'adminLog', 'Conectando admin...');
+      adminSocket.emit('registerUser', 'office');
+    }
+
+    function adminOpenChat() {
+      const empIdVal = document.getElementById('adminEmpId').value.trim();
+      if (!empIdVal) return alert('Ingresa un ID de empleado');
+      
+      if (!adminSocket) return alert('Admin no conectado');
+      
+      adminSocket.emit('joinRoom', { userId: empIdVal, role: 'admin' });
+      log('info', 'adminLog', `📍 Uniéndose a sala de chat: ${empIdVal}`);
+    }
+
+    function adminSendMessage() {
+      const empIdVal = document.getElementById('adminEmpId').value.trim();
+      const msg = document.getElementById('adminMsgInput').value.trim();
+      
+      if (!msg) return alert('Escribe un mensaje');
+      if (!empIdVal) return alert('Ingresa un ID de empleado');
+      if (!adminSocket) return alert('Admin no conectado');
+
+      adminSocket.emit('sendMessage', {
+        from: 'office',
+        to: empIdVal,
+        text: msg,
+        imageUrl: ''
+      });
+
+      log('success', 'adminLog', `✅ Mensaje enviado: "${msg}"`);
+      document.getElementById('adminMsgInput').value = '';
+    }
+
+    function connectEmployee() {
+      empSocket = io();
+      
+      empSocket.on('connect', () => {
+        log('success', 'empLog', '✅ Empleado conectado al servidor');
+        document.getElementById('empStatus').innerHTML = 'Conectado';
+        document.getElementById('empStatus').className = 'status connected';
+      });
+
+      empSocket.on('registerUser', () => {
+        log('info', 'empLog', 'ℹ️ Empleado registrado');
+      });
+
+      empSocket.on('receiveMessage', (msg) => {
+        log('info', 'empLog', `📨 Mensaje recibido: "${msg.text}" de ${msg.sender}`);
+      });
+
+      empSocket.on('disconnect', () => {
+        log('error', 'empLog', '❌ Empleado desconectado');
+        document.getElementById('empStatus').innerHTML = 'Desconectado';
+        document.getElementById('empStatus').className = 'status disconnected';
+      });
+
+      // === KEEP-ALIVE: Responder a heartbeats del servidor ===
+      empSocket.on('heartbeat', () => {
+        log('info', 'empLog', '💓 Heartbeat recibido (servidor activo)');
+      });
+
+      // Usar un ID simulado
+      empId = 'test-emp-' + Math.random().toString(36).substr(2, 9);
+      log('info', 'empLog', `Conectando empleado con ID: ${empId}`);
+      
+      empSocket.emit('registerUser', empId);
+      empSocket.emit('joinRoom', { userId: empId, role: 'employee' });
+      
+      log('info', 'empLog', `📍 Sala de empleado: ${empId}`);
+      document.getElementById('adminEmpId').value = empId;
+    }
+
+    function empSendMessage() {
+      const msg = document.getElementById('empMsgInput').value.trim();
+      
+      if (!msg) return alert('Escribe un mensaje');
+      if (!empSocket) return alert('Empleado no conectado');
+      if (!empId) return alert('Empleado sin ID');
+
+      empSocket.emit('sendMessage', {
+        from: empId,
+        to: 'office',
+        text: msg,
+        imageUrl: ''
+      });
+
+      log('success', 'empLog', `✅ Mensaje enviado: "${msg}"`);
+      document.getElementById('empMsgInput').value = '';
+    }
+  </script>
+</body>
+</html>

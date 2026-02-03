@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Chat con Administrador - Luber</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+      max-height: 750px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .chat-header h2 {
+      font-size: 1.3em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: 50px;
+      background: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9em;
+      animation: pulse 2s infinite;
+      display: none;
+    }
+
+    .notification-badge.active {
+      display: flex;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+      }
+    }
+
+    .chat-header button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.2em;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .chat-header button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    #logoutBtn {
+      background: rgba(220, 53, 69, 0.8);
+      font-size: 0.9em;
+      padding: 8px 12px;
+      margin-left: 5px;
+    }
+
+    #logoutBtn:hover {
+      background: rgba(220, 53, 69, 1);
+    }
+
+    .schedule-selector {
+      padding: 15px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .schedule-selector label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+
+    .schedule-selector select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9em;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    .schedule-selector select:focus {
+      border-color: #667eea;
+    }
+
+    .schedule-info-display {
+      padding: 12px 15px;
+      background: #e8f4f8;
+      border-left: 4px solid #3498db;
+      margin: 0;
+      border-bottom: 1px solid #d0e8f2;
+    }
+
+    .schedule-info-display p {
+      margin: 5px 0;
+      font-size: 0.85em;
+      color: #2c3e50;
+    }
+
+    .schedule-info-display strong {
+      color: #2980b9;
+    }
+
+    .schedule-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dispatch-status-btn {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85em;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .dispatch-status-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+    }
+
+    .dispatch-status-btn:active {
+      transform: translateY(0);
+    }
+
+    /* MODAL STYLES */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .modal-header h2 {
+      color: #667eea;
+      font-size: 1.5em;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.8em;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: #333;
+    }
+
+    .dispatch-status-item {
+      padding: 15px;
+      margin: 12px 0;
+      border-left: 4px solid #667eea;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+
+    .dispatch-status-item strong {
+      color: #333;
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.95em;
+    }
+
+    .dispatch-status-item .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .dispatch-status-item .status-badge.accepted {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .dispatch-status-item .status-badge.rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .dispatch-status-item .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .confirmation-img {
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+
+    .confirmation-img:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-footer {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #f0f0f0;
+      text-align: right;
+    }
+
+    .modal-footer button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+
+    .modal-footer button:hover {
+      transform: translateY(-2px);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 10px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.sent {
+      justify-content: flex-end;
+    }
+
+    .message.received {
+      justify-content: flex-start;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      word-wrap: break-word;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    .message.sent .message-bubble {
+      background: #667eea;
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+    }
+
+    .message.received .message-bubble {
+      background: white;
+      color: #333;
+      border: 1px solid #e0e0e0;
+      border-radius: 18px 18px 18px 4px;
+    }
+
+    .message-image {
+      max-width: 150px;
+      margin-top: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .message-time {
+      font-size: 0.75em;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .chat-input-area {
+      padding: 15px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .input-form {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .input-form textarea {
+      flex: 1;
+      min-width: 150px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 0.95em;
+      resize: none;
+      max-height: 100px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-form textarea:focus {
+      border-color: #667eea;
+    }
+
+    .input-form textarea::placeholder {
+      color: #999;
+    }
+
+    .image-input-label {
+      cursor: pointer;
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 1.2em;
+      transition: background 0.3s;
+    }
+
+    .image-input-label:hover {
+      background: #e0e0e0;
+    }
+
+    .input-form input[type="file"] {
+      display: none;
+    }
+
+    .input-form button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+
+    .input-form button:hover {
+      transform: scale(1.05);
+    }
+
+    .input-form button:active {
+      transform: scale(0.95);
+    }
+
+    .empty-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: #999;
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    .notification-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-left: 4px solid #667eea;
+      padding: 15px 20px;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      animation: slideInRight 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification-toast .toast-title {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .notification-toast .toast-message {
+      color: #555;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 600px) {
+      .chat-container {
+        max-height: 100vh;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100%;
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
+      .chat-header {
+        padding: 15px;
+        border-radius: 0;
+      }
+
+      .chat-header h2 {
+        font-size: 1em;
+        gap: 8px;
+      }
+
+      .chat-header button {
+        font-size: 1em;
+        padding: 5px 8px;
+      }
+
+      .schedule-selector {
+        padding: 12px;
+      }
+
+      .schedule-selector label {
+        font-size: 0.85em;
+        margin-bottom: 6px;
+      }
+
+      .schedule-selector select {
+        padding: 8px;
+        font-size: 0.85em;
+      }
+
+      .schedule-info-display {
+        padding: 10px 12px;
+        margin: 0;
+        border-left-width: 3px;
+      }
+
+      .schedule-info-display p {
+        margin: 4px 0;
+        font-size: 0.8em;
+      }
+
+      .chat-messages {
+        padding: 12px;
+        gap: 8px;
+      }
+
+      .message-bubble {
+        max-width: 85%;
+        padding: 10px 12px;
+        font-size: 0.9em;
+      }
+
+      .message-image {
+        max-width: 120px;
+      }
+
+      .message-time {
+        font-size: 0.7em;
+      }
+
+      .chat-input-area {
+        padding: 12px;
+        border-radius: 0;
+      }
+
+      .input-form {
+        gap: 8px;
+      }
+
+      .input-form textarea {
+        padding: 8px;
+        font-size: 0.9em;
+        min-height: 40px;
+      }
+
+      .image-input-label {
+        padding: 8px;
+        font-size: 1.1em;
+        flex-shrink: 0;
+      }
+
+      .input-form button {
+        padding: 8px 16px;
+        font-size: 0.9em;
+        flex-shrink: 0;
+      }
+
+      .notification-toast {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: 100%;
+        border-radius: 4px;
+        padding: 12px 15px;
+      }
+
+      .empty-state {
+        font-size: 1em;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .chat-header h2 {
+        font-size: 0.9em;
+      }
+
+      .message-bubble {
+        max-width: 90%;
+      }
+
+      .message-image {
+        max-width: 100px;
+      }
+
+      .input-form {
+        gap: 6px;
+      }
+
+      .input-form button {
+        padding: 8px 12px;
+        font-size: 0.85em;
+      }
+
+      .schedule-selector label {
+        font-size: 0.8em;
+      }
+
+      .schedule-info-display p {
+        font-size: 0.75em;
+      }
+    }
+
+    @media (min-width: 601px) and (max-height: 600px) {
+      .chat-container {
+        height: 95vh;
+        max-height: 95vh;
+      }
+
+      .schedule-selector {
+        padding: 10px;
+      }
+
+      .chat-messages {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>💬 Chat Admin</h2>
+      <div class="notification-badge" id="notificationBadge">🔔</div>
+      <button id="logoutBtn" title="Cerrar sesión">🚪 Logout</button>
+      <button id="closeBtn" title="Cerrar chat">✕</button>
+    </div>
+
+    <!-- Selector de Schedules -->
+    <div class="schedule-selector">
+      <label for="scheduleSelect">📅 Selecciona un Schedule Activo (opcional):</label>
+      <select id="scheduleSelect" onchange="handleScheduleChange()">
+        <option value="">-- Ninguno seleccionado --</option>
+      </select>
+      <div id="scheduleInfoDisplay" class="schedule-info-display" style="display: none;"></div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-state">Cargando mensajes...</div>
+    </div>
+
+    <div class="chat-input-area">
+      <form id="chatForm" class="input-form">
+        <textarea 
+          id="messageInput" 
+          placeholder="Escribe tu mensaje aquí..." 
+          rows="2" 
+          required>
+        </textarea>
+        
+        <label for="imageInput" class="image-input-label" title="Subir imagen">
+          📷
+          <input type="file" id="imageInput" accept="image/*">
+        </label>
+
+        <button type="submit" title="Enviar mensaje">▶</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Dispatch Status -->
+  <div id="dispatchModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 Dispatch Status</h2>
+        <button class="modal-close" onclick="closeDispatchModal()">✕</button>
+      </div>
+      <div id="dispatchStatusContent"></div>
+      <div class="modal-footer">
+        <button onclick="closeDispatchModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const messageInput = document.getElementById('messageInput');
+    const imageInput = document.getElementById('imageInput');
+    const closeBtn = document.getElementById('closeBtn');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const scheduleSelect = document.getElementById('scheduleSelect');
+    const scheduleInfoDisplay = document.getElementById('scheduleInfoDisplay');
+
+    let employeeId = null;
+    let adminId = 'office';
+    let schedules = [];
+    let unreadCount = 0;
+
+    async function loadEmployeeId() {
+      try {
+        const res = await fetch('/api/current-employee');
+        const data = await res.json();
+        if (data && data._id) {
+          employeeId = data._id;
+          console.log('✅ Empleado cargado:', employeeId);
+          loadMessages();
+          loadSchedules();
+          joinChatRoom();
+        }
+      } catch (err) {
+        console.error('❌ Error cargando empleado:', err);
+        chatMessages.innerHTML = '<div class="empty-state">Error al cargar. Por favor recarga la página.</div>';
+      }
+    }
+
+    function joinChatRoom() {
+      socket.emit('joinRoom', { userId: employeeId, role: 'employee' });
+      socket.emit('registerUser', employeeId);
+      console.log('✅ Empleado registrado y unido a sala de chat');
+    }
+
+    async function loadMessages() {
+      try {
+        const res = await fetch(`/chat/convo/${employeeId}`);
+        const messages = await res.json();
+
+        chatMessages.innerHTML = '';
+
+        if (!messages || messages.length === 0) {
+          chatMessages.innerHTML = '<div class="empty-state">📭 No hay mensajes aún. ¡Inicia la conversación!</div>';
+        } else {
+          messages.forEach(msg => renderMessage(msg));
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Limpiar contador de mensajes sin leer cuando el empleado abre el chat
+        unreadCount = 0;
+        localStorage.setItem(`unreadMessages_${employeeId}`, '0');
+        updateNotificationBadge();
+      } catch (err) {
+        console.error('❌ Error cargando mensajes:', err);
+        chatMessages.innerHTML = '<div class="empty-state">Error al cargar mensajes</div>';
+      }
+    }
+
+    async function loadSchedules() {
+      try {
+        console.log('📥 Cargando schedules para empleado:', employeeId);
+        const res = await fetch(`/api/employee-schedules/${employeeId}`);
+        schedules = await res.json();
+        console.log('📅 Schedules cargados (TOTAL):', schedules.length, schedules);
+        
+        const activeSchedules = schedules.filter(sch => {
+          return !sch.Completed && (!sch.reserved || sch.acceptedBy?.toString() === employeeId);
+        });
+
+        console.log('📅 Schedules activos (FILTRADOS):', activeSchedules.length, activeSchedules);
+
+        scheduleSelect.innerHTML = '<option value="">-- Ninguno seleccionado --</option>';
+        activeSchedules.forEach(sch => {
+          const option = document.createElement('option');
+          option.value = sch._id;
+          option.textContent = `${sch.date} @ ${sch.time} - ${sch.customerName}`;
+          scheduleSelect.appendChild(option);
+          console.log('✅ Schedule agregado al dropdown:', sch._id);
+        });
+        
+        console.log('✅ Total de schedules en dropdown:', scheduleSelect.options.length - 1);
+      } catch (err) {
+        console.error('❌ Error cargando schedules:', err);
+      }
+    }
+
+    function handleScheduleChange() {
+      try {
+        const scheduleId = scheduleSelect.value;
+        console.log('🔄 Schedule seleccionado:', scheduleId);
+        
+        if (!scheduleId) {
+          console.log('⏭️ No hay schedule seleccionado');
+          scheduleInfoDisplay.style.display = 'none';
+          return;
+        }
+
+        const schedule = schedules.find(s => s._id === scheduleId);
+        if (!schedule) {
+          console.error('❌ Schedule no encontrado en array:', scheduleId);
+          console.log('Schedules disponibles:', schedules);
+          return;
+        }
+
+        console.log('✅ Schedule encontrado:', schedule);
+
+        let html = `
+          <p><strong>📅 Fecha:</strong> ${schedule.date}</p>
+          <p><strong>⏰ Hora:</strong> ${schedule.time}</p>
+          <p><strong>👤 Cliente:</strong> ${schedule.customerName}</p>
+          <p><strong>📍 Dirección:</strong> ${schedule.clientAddress}</p>
+          <p><strong>💰 Precio:</strong> $${schedule.offerPrice || 'N/A'}</p>
+        `;
+
+        if (schedule.vehicles && schedule.vehicles.length > 0) {
+          html += `<p><strong>🚗 Vehículos:</strong> ${schedule.vehicles.length}</p>`;
+        }
+
+        // Agregar botón de Dispatch Status (siempre visible)
+        const dispatchStatusIcon = schedule.DispatchAccepted ? '✅' : '⏳';
+        html += `<div class="schedule-buttons"><button class="dispatch-status-btn" onclick="openDispatchModal('${scheduleId}')">${dispatchStatusIcon} Dispatch Status</button></div>`;
+
+        console.log('📋 HTML generado:', html);
+        
+        scheduleInfoDisplay.innerHTML = html;
+        scheduleInfoDisplay.style.display = 'block';
+
+        console.log('✅ Información del schedule mostrada');
+        sendScheduleInfo(schedule);
+      } catch (err) {
+        console.error('❌ Error en handleScheduleChange:', err);
+        console.error('Stack trace:', err.stack);
+      }
+    }
+
+    function sendScheduleInfo(schedule) {
+      const scheduleInfo = `📅 INFORMACIÓN DEL SCHEDULE:
+- Fecha: ${schedule.date} @ ${schedule.time}
+- Cliente: ${schedule.customerName}
+- Dirección: ${schedule.clientAddress}
+- Precio: $${schedule.offerPrice || 'N/A'}
+- Tipo: ${schedule.accountType}${schedule.vehicles ? `\n- Vehículos: ${schedule.vehicles.length}` : ''}`;
+
+      socket.emit('sendMessage', {
+        from: employeeId,
+        to: adminId,
+        text: scheduleInfo,
+        imageUrl: ''
+      });
+
+      console.log('✅ Información de schedule enviada al admin');
+    }
+
+    function showNotification(title, message) {
+      const toast = document.createElement('div');
+      toast.className = 'notification-toast';
+      toast.innerHTML = `
+        <div class="toast-title">🔔 ${title}</div>
+        <div class="toast-message">${message}</div>
+      `;
+      document.body.appendChild(toast);
+
+      unreadCount++;
+      updateNotificationBadge();
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function updateNotificationBadge() {
+      if (unreadCount > 0) {
+        notificationBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+        notificationBadge.classList.add('active');
+      } else {
+        notificationBadge.classList.remove('active');
+      }
+    }
+
+    function renderMessage(msg) {
+      const div = document.createElement('div');
+      const isFromMe = msg.sender === employeeId;
+      
+      div.classList.add('message', isFromMe ? 'sent' : 'received');
+
+      const bubble = document.createElement('div');
+      bubble.classList.add('message-bubble');
+
+      const sender = isFromMe ? '👤 Tú' : '🛠️ Admin';
+      let content = `<strong>${sender}:</strong> ${escapeHtml(msg.text || '')}`;
+
+      if (msg.imageUrl) {
+        content += `<br><img src="${msg.imageUrl}" alt="img" class="message-image">`;
+      }
+
+      const time = msg.at ? new Date(msg.at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+
+      bubble.innerHTML = content;
+      div.appendChild(bubble);
+
+      if (time) {
+        const timeSpan = document.createElement('div');
+        timeSpan.classList.add('message-time');
+        timeSpan.textContent = time;
+        div.appendChild(timeSpan);
+      }
+
+      chatMessages.appendChild(div);
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const text = messageInput.value.trim();
+      const file = imageInput.files[0];
+
+      let imageUrl = '';
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('chatImage', file);
+
+        try {
+          const res = await fetch('/upload-chat-image', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            imageUrl = data.url;
+          } else {
+            alert('❌ Error al subir imagen');
+            return;
+          }
+        } catch (err) {
+          console.error('❌ Error subiendo imagen:', err);
+          alert('Error al subir imagen');
+          return;
+        }
+      }
+
+      if (!text && !imageUrl) {
+        alert('Por favor escribe un mensaje o sube una imagen');
+        return;
+      }
+
+      try {
+        const message = {
+          sender: employeeId,
+          text: text || '',
+          imageUrl: imageUrl || ''
+        };
+
+        socket.emit('sendMessage', {
+          from: employeeId,
+          to: adminId,
+          text: text,
+          imageUrl: imageUrl
+        });
+
+        renderMessage(message);
+
+        messageInput.value = '';
+        imageInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (err) {
+        console.error('❌ Error enviando mensaje:', err);
+        alert('Error al enviar mensaje');
+      }
+    });
+
+    socket.on('receiveMessage', (msg) => {
+      console.log('📨 Mensaje Socket.IO recibido en empleado:', msg);
+      
+      if (msg.to === employeeId || msg.sender === 'office') {
+        console.log('✅ Mensaje es para este empleado, renderizando...');
+        const msgToRender = {
+          sender: msg.sender,
+          text: msg.text,
+          imageUrl: msg.imageUrl,
+          at: msg.at
+        };
+        renderMessage(msgToRender);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    });
+
+    socket.on('newMessageNotification', (notification) => {
+      console.log('🔔 Notificación recibida:', notification);
+      showNotification(notification.sender, `Nuevo mensaje: "${notification.preview}..."`);
+    });
+
+    // === KEEP-ALIVE: Responder a heartbeats del servidor ===
+    socket.on('heartbeat', (data) => {
+      console.log('💓 Heartbeat recibido del servidor');
+      // El simple hecho de recibir mantiene la conexión activa
+      // Socket.IO maneja automáticamente la respuesta
+    });
+
+    closeBtn.addEventListener('click', () => {
+      if (confirm('¿Cerrar el chat?')) {
+        // Notificar a la ventana padre que se leyeron los mensajes
+        if (window.opener) {
+          window.opener.postMessage({ type: 'messagesRead', employeeId }, '*');
+        }
+        window.close();
+      }
+    });
+
+    // === LOGOUT BUTTON ===
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        // Desconectar socket
+        socket.disconnect();
+        // Redirigir a logout
+        window.location.href = '/logout';
+      }
+    });
+
+    // Sincronizar contador con la ventana padre usando localStorage
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem(`unreadMessages_${employeeId}`, '0');
+      if (window.opener) {
+        window.opener.postMessage({ type: 'messagesRead', employeeId }, '*');
+      }
+    });
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // === FUNCIONES PARA DISPATCH STATUS MODAL ===
+    function openDispatchModal(scheduleId) {
+      const schedule = schedules.find(s => s._id === scheduleId);
+      if (!schedule) {
+        console.error('❌ Schedule no encontrado');
+        return;
+      }
+
+      let html = '';
+
+      // === ESTADOS PRINCIPALES DE DISPATCH ===
+      html += `<div style="background: #f0f4ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #667eea;">`;
+      
+      // Estado 1: DispatchAccepted (PRINCIPAL)
+      const acceptedStatus = schedule.DispatchAccepted === true ? 'Aceptado' : 'Pendiente';
+      const acceptedBadge = schedule.DispatchAccepted === true ? 'accepted' : 'pending';
+      const acceptedIcon = schedule.DispatchAccepted === true ? '✅' : '⏳';
+      
+      html += `
+        <div style="margin-bottom: 15px;">
+          <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 8px;">
+            ${acceptedIcon} Estado de Aceptación por Dispatch
+          </div>
+          <span class="status-badge ${acceptedBadge}" style="font-size: 0.95em; padding: 6px 16px;">${acceptedStatus}</span>
+          <p style="font-size: 0.9em; color: #666; margin-top: 8px;">Indica si el dispatch aceptó la oferta</p>
+        </div>
+      `;
+
+      // Estado 2: DispatchReady
+      if (schedule.DispatchReady !== undefined) {
+        const readyStatus = schedule.DispatchReady === true ? 'Listo para Proceder' : 'No Listo';
+        const readyBadge = schedule.DispatchReady === true ? 'accepted' : 'pending';
+        const readyIcon = schedule.DispatchReady === true ? '📦' : '⏳';
+        
+        html += `
+          <div>
+            <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 8px;">
+              ${readyIcon} Estado de Preparación
+            </div>
+            <span class="status-badge ${readyBadge}" style="font-size: 0.95em; padding: 6px 16px;">${readyStatus}</span>
+            <p style="font-size: 0.9em; color: #666; margin-top: 8px;">Indica si el dispatch está listo para proceder</p>
+          </div>
+        `;
+      }
+      
+      html += `</div>`;
+
+      // === INFORMACIÓN ADICIONAL ===
+      // Comprobante de Compra - Imagen
+      if (schedule.PurchaseConfirmationIMG && schedule.PurchaseConfirmationIMG.length > 0) {
+        html += `
+          <div class="dispatch-status-item">
+            <strong>🧾 Comprobante de Compra</strong>
+            <p>Imagen del recibo:</p>
+        `;
+        
+        schedule.PurchaseConfirmationIMG.forEach(imgUrl => {
+          html += `<img src="${imgUrl}" alt="Comprobante" class="confirmation-img" onclick="window.open('${imgUrl}', '_blank')" title="Haz clic para ampliar">`;
+        });
+        
+        html += `</div>`;
+      }
+
+      // Número de Confirmación
+      if (schedule.PurchaseConfirmationNumber) {
+        html += `
+          <div class="dispatch-status-item">
+            <strong>🔢 Número de Confirmación</strong>
+            <p style="font-size: 1.1em; font-weight: bold; color: #667eea; letter-spacing: 1px;">${schedule.PurchaseConfirmationNumber}</p>
+          </div>
+        `;
+      }
+
+      if (!html || html.includes('Pendiente')) {
+        // Siempre mostrar al menos el estado de aceptación
+      }
+
+      document.getElementById('dispatchStatusContent').innerHTML = html;
+      document.getElementById('dispatchModal').classList.add('show');
+    }
+
+    function closeDispatchModal() {
+      document.getElementById('dispatchModal').classList.remove('show');
+    }
+
+    // Cerrar modal al hacer clic fuera del contenido
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('dispatchModal');
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            closeDispatchModal();
+          }
+        });
+      }
+    });
+
+    // === FUNCIÓN DE DEBUGGING GLOBAL ===
+    window.debugSchedules = function() {
+      console.log('=== DEBUG SCHEDULES ===');
+      console.log('Employee ID:', employeeId);
+      console.log('Schedules en memoria:', schedules);
+      console.log('Opciones en dropdown:', scheduleSelect.options.length - 1);
+      console.log('Schedule seleccionado:', scheduleSelect.value);
+      if (scheduleSelect.value) {
+        const selectedSchedule = schedules.find(s => s._id === scheduleSelect.value);
+        console.log('Datos del schedule seleccionado:', selectedSchedule);
+      }
+    };
+
+    loadEmployeeId();
+  </script>
+</body>
+</html>
