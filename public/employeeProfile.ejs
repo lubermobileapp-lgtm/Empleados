@@ -1941,6 +1941,7 @@ Ganancias totales: $${total.toFixed(2)}
         const response = await fetch('/accept-multiple-offers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ 
             scheduleIds: selectedSchedules.map(s => s.id)
           })
@@ -2087,6 +2088,7 @@ Ganancias totales: $${total.toFixed(2)}
             const res = await fetch('/accept-offer', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({ scheduleId, location })
             });
             
@@ -2382,6 +2384,7 @@ Ganancias totales: $${total.toFixed(2)}
       fetch('/update-employee-location', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include session cookies
         body: JSON.stringify({ scheduleId, location: gpsLocation }),
         signal: controller.signal
       })
@@ -2444,6 +2447,7 @@ Ganancias totales: $${total.toFixed(2)}
         const res = await fetch('/update-status', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -2656,6 +2660,7 @@ Ganancias totales: $${total.toFixed(2)}
         const res = await fetch('/update-status', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ scheduleId, statusKey: 'Arrived' })
         });
         const data = await res.json();
@@ -2961,7 +2966,9 @@ Ganancias totales: $${total.toFixed(2)}
       }
       
       try {
-        const res = await fetch(`/api/employee-location/${currentScheduleIdEmployee}`);
+        const res = await fetch(`/api/employee-location/${currentScheduleIdEmployee}`, {
+          credentials: 'include'
+        });
         if (!res.ok) {
           console.error('❌ Error al obtener ubicación del servidor');
           return;
