@@ -2096,7 +2096,7 @@ Ganancias totales: $${total.toFixed(2)}
             console.log('Respuesta del servidor:', data);
             
             if (data.success) {
-              alert('✅ Orden aceptada.\n\n📍 Se pedirá acceso a tu ubicación GPS para comenzar el rastreo automático cada minuto.\n\nPor favor, haz clic en "Permitir" cuando el navegador lo solicite.');
+              alert('✅ Orden aceptada.\n\n📍 Se pedirá acceso a tu ubicación GPS para comenzar el rastreo automático cada 30 segundos.\n\nPor favor, haz clic en "Permitir" cuando el navegador lo solicite.');
               
               // 🚀 Start location tracking immediately after acceptance
               startLocationTracking(scheduleId);
@@ -2139,7 +2139,7 @@ Ganancias totales: $${total.toFixed(2)}
       });
     }
 
-    // 🕐 Start location tracking every minute
+    // 🕐 Start location tracking every 30 seconds
     function startLocationTracking(scheduleId) {
       // Prevent duplicate tracking for same schedule
       if (locationTracking[scheduleId]) {
@@ -2438,7 +2438,7 @@ Ganancias totales: $${total.toFixed(2)}
 
       // 📍 Start location tracking when employee is on the road (in background, don't wait)
       if (statusKey === 'OnRoad') {
-        alert('Se iniciara el rastreo cada minuto.\n\nPermitir acceso a tu ubicacion cuando lo solicite el navegador.');
+        alert('Se iniciara el rastreo cada 30 segundos.\n\nPermitir acceso a tu ubicacion cuando lo solicite el navegador.');
         // Start tracking in background WITHOUT waiting for first location
         setTimeout(() => startLocationTracking(scheduleId), 100);
       }
@@ -2814,7 +2814,7 @@ Ganancias totales: $${total.toFixed(2)}
         }
       }, 100);
 
-      // Iniciar auto-refresh cada minuto cuando la ventana esté abierta
+      // Iniciar auto-refresh cada 30 segundos cuando la ventana esté abierta
       startLocationRefreshEmployee();
     }
 
@@ -3001,7 +3001,7 @@ Ganancias totales: $${total.toFixed(2)}
 
     function startLocationRefreshEmployee() {
       if (locationRefreshIntervalEmployee) clearInterval(locationRefreshIntervalEmployee);
-      // Refrescar cada minuto (60000 ms = 1 minuto)
+      // Refrescar cada 30 segundos (30000 ms = 30 segundos)
       locationRefreshIntervalEmployee = setInterval(refreshLocationNowEmployee, 60000);
     }
 
