@@ -2145,16 +2145,16 @@ Ganancias totales: $${total.toFixed(2)}
         clearInterval(locationTracking[scheduleId]);
       }
 
-      console.log(`🚀 [${scheduleId}] Iniciando rastreo de ubicación cada minuto`);
+      console.log(`🚀 [${scheduleId}] Iniciando rastreo de ubicación cada 30 segundos`);
       
       // Get location immediately
       updateEmployeeLocation(scheduleId);
       
-      // Then get location every 60 seconds (1 minute)
+      // Then get location every 30 seconds
       const intervalId = setInterval(() => {
-        console.log(`⏰ [${scheduleId}] Buscando ubicación (Cada minuto)...`);
+        console.log(`⏰ [${scheduleId}] Buscando ubicación (Cada 30 segundos)...`);
         updateEmployeeLocation(scheduleId);
-      }, 60000); // 60,000 milliseconds = 1 minute
+      }, 30000); // 30,000 milliseconds = 30 seconds
 
       // Store the interval ID
       locationTracking[scheduleId] = intervalId;
