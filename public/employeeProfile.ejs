@@ -1331,6 +1331,20 @@
                 <div class="schedule-card" id="card-<%= schedule._id %>">
                   <!-- COLLAPSED VIEW -->
                   <div class="schedule-card-header" onclick="toggleScheduleCard('<%= schedule._id %>')">
+                    <!-- Checkbox for Route Planning -->
+                    <div style="display: flex; align-items: center; padding: 0 15px;">
+                      <input 
+                        type="checkbox" 
+                        class="schedule-checkbox" 
+                        data-schedule-id="<%= schedule._id %>"
+                        data-address="<%= schedule.clientAddress %>"
+                        data-date="<%= schedule.date %>"
+                        data-time="<%= schedule.time %>"
+                        data-offer="<%= schedule.offerPrice || 0 %>"
+                        onclick="event.stopPropagation(); updateSelectionCounter()"
+                        style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
+
                     <!-- Customer -->
                     <div class="schedule-card-customer">
                       <div class="schedule-card-customer-name"><%= schedule.customerName %></div>
@@ -1851,6 +1865,14 @@
       document.querySelectorAll('.schedule-checkbox').forEach(cb => cb.checked = false);
       selectedSchedules = [];
       updateSelectionCounter();
+    }
+
+    function updateSelectionCounter() {
+      const checkedBoxes = document.querySelectorAll('.schedule-checkbox:checked');
+      const counter = document.getElementById('selectionCounter');
+      if (counter) {
+        counter.textContent = `${checkedBoxes.length} selected`;
+      }
     }
 
     function openRoutePlanner() {
