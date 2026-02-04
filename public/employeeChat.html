@@ -1009,12 +1009,32 @@
           imageUrl: imageUrl || ''
         };
 
-        socket.emit('sendMessage', {
-          from: employeeId,
-          to: adminId,
-          text: text,
-          imageUrl: imageUrl
-        });
+        // Intentar enviar via Socket.IO primero
+        if (socket.connected) {
+          console.log('✅ Enviando via Socket.IO...');
+          socket.emit('sendMessage', {
+            from: employeeId,
+            to: adminId,
+            text: text,
+            imageUrl: imageUrl
+          });
+        } else {
+          // Fallback: enviar via HTTP POST
+          console.log('⚠️ Socket.IO no conectado, usando HTTP POST...');
+          const res = await fetch(`/chat/convo/${adminId}/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sender: employeeId,
+              text: text,
+              imageUrl: imageUrl
+            })
+          });
+
+          if (!res.ok) {
+            throw new Error('Error en envío HTTP');
+          }
+        }
 
         renderMessage(message);
 
