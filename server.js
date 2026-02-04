@@ -12,9 +12,16 @@ const PDFDocument = require('pdfkit');
 const http = require('http');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const SocketIO = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
+const io = SocketIO(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // === MEMORY MONITOR & ANTI-FREEZE ===
 let lastRequestTime = Date.now();
@@ -29,7 +36,88 @@ setInterval(() => {
   }
 }, 30000);
 
-// Socket.IO eliminado - El cliente consultará ubicaciones con un botón de refresh en el modal
+// === SOCKET.IO CHAT CONFIGURATION ===
+const connectedUsers = new Map(); // Map to store connected users
+
+io.on('connection', (socket) => {
+  console.log(`✅ Nuevo cliente conectado: ${socket.id}`);
+
+  socket.on('registerUser', (userId) => {
+    connectedUsers.set(userId, socket.id);
+    console.log(`📍 Usuario registrado: ${userId} con socket ${socket.id}`);
+    socket.userId = userId;
+  });
+
+  socket.on('joinRoom', (data) => {
+    const { userId, role } = data;
+    socket.join(`chat_${userId}`);
+    socket.userId = userId;
+    socket.role = role;
+    console.log(`📍 ${role} ${userId} se unió a la sala chat_${userId}`);
+  });
+
+  socket.on('sendMessage', async (data) => {
+    try {
+      const { from, to, text, imageUrl } = data;
+      const sender = from || socket.userId;
+      const receiverId = to || 'office';
+      
+      console.log(`💬 Mensaje de ${sender} a ${receiverId}: "${text}"`);
+
+      // Guardar mensaje en BD
+      const ChatConversation = require('./models/ChatConversation');
+      const participants = [sender, receiverId].sort();
+      
+      const message = {
+        sender,
+        text: text || '',
+        imageUrl: imageUrl || '',
+        at: new Date()
+      };
+
+      let conversation = await ChatConversation.findOne({ participants });
+      if (!conversation) {
+        conversation = new ChatConversation({ participants, messages: [message] });
+      } else {
+        conversation.messages.push(message);
+      }
+      await conversation.save();
+
+      // Enviar mensaje al receptor
+      const receiverSocketId = connectedUsers.get(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit('receiveMessage', {
+          sender,
+          text: text || '',
+          imageUrl: imageUrl || '',
+          to: receiverId,
+          at: new Date()
+        });
+        console.log(`✅ Mensaje entregado a ${receiverId}`);
+      } else {
+        console.log(`⚠️ El receptor ${receiverId} no está conectado`);
+      }
+
+      // Enviar notificación al receptor
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit('newMessageNotification', {
+          sender,
+          preview: (text || 'Imagen').substring(0, 50)
+        });
+      }
+    } catch (err) {
+      console.error('❌ Error enviando mensaje:', err);
+      socket.emit('messageError', { error: 'Error al enviar mensaje' });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    if (socket.userId) {
+      connectedUsers.delete(socket.userId);
+      console.log(`👋 Usuario desconectado: ${socket.userId}`);
+    }
+  });
+});
 // === RUTAS IMPORTANTES DE ARCHIVOS ===
 const fontPath = path.join(__dirname, 'public/fonts/DejaVuSans.ttf');
 const bgPath = path.join(__dirname, 'public/images/w2-background.png');
@@ -996,6 +1084,59 @@ app.get('/chat/convo/:userId', async (req, res) => {
   } catch (err) {
     console.error('❌ Error al obtener conversación:', err);
     res.status(500).json({ error: 'Error al obtener el chat' });
+  }
+});
+
+// === CHAT API - Send message (HTTP fallback) ===
+app.post('/chat/convo/:userId/send', async (req, res) => {
+  try {
+    const { text, imageUrl, sender } = req.body;
+    const receiverId = req.params.userId;
+    const senderId = sender || req.session?.empId;
+
+    if (!senderId || (!text && !imageUrl)) {
+      return res.status(400).json({ error: 'Campos requeridos faltantes' });
+    }
+
+    const ChatConversation = require('./models/ChatConversation');
+    const participants = [senderId, receiverId].sort();
+    
+    const message = {
+      sender: senderId,
+      text: text || '',
+      imageUrl: imageUrl || '',
+      at: new Date()
+    };
+
+    let conversation = await ChatConversation.findOne({ participants });
+    if (!conversation) {
+      conversation = new ChatConversation({ participants, messages: [message] });
+    } else {
+      conversation.messages.push(message);
+    }
+    
+    await conversation.save();
+
+    // Emit via Socket.IO si el receptor está conectado
+    const receiverSocketId = connectedUsers.get(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('receiveMessage', {
+        sender: senderId,
+        text: text || '',
+        imageUrl: imageUrl || '',
+        to: receiverId,
+        at: new Date()
+      });
+      io.to(receiverSocketId).emit('newMessageNotification', {
+        sender: senderId,
+        preview: (text || 'Imagen').substring(0, 50)
+      });
+    }
+
+    res.json({ success: true, message });
+  } catch (err) {
+    console.error('❌ Error enviando mensaje:', err);
+    res.status(500).json({ error: 'Error al enviar mensaje' });
   }
 });
 
