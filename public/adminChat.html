@@ -963,22 +963,47 @@
 
       if (!text && !imageUrl) return;
 
-      socket.emit('sendMessage', {
-        from: 'office',
-        to: employeeId,
-        text: text || '',
-        imageUrl: imageUrl || ''
-      });
+      try {
+        // Intentar enviar via Socket.IO primero
+        if (socket.connected) {
+          console.log('✅ Enviando via Socket.IO...');
+          socket.emit('sendMessage', {
+            from: 'office',
+            to: employeeId,
+            text: text || '',
+            imageUrl: imageUrl || ''
+          });
+        } else {
+          // Fallback: enviar via HTTP POST
+          console.log('⚠️ Socket.IO no conectado, usando HTTP POST...');
+          const res = await fetch(`/chat/convo/${employeeId}/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sender: 'office',
+              text: text,
+              imageUrl: imageUrl
+            })
+          });
 
-      renderMessage(employeeId, 'admin', text, imageUrl, new Date());
-      
-      // Limpiar contador cuando el admin responde
-      unreadMessages[employeeId] = 0;
-      updateUnreadBadge(employeeId);
-      updateEmployeeItemInList(employeeId);
-      
-      input.value = '';
-      imageInput.value = '';
+          if (!res.ok) {
+            throw new Error('Error en envío HTTP');
+          }
+        }
+
+        renderMessage(employeeId, 'admin', text, imageUrl, new Date());
+        
+        // Limpiar contador cuando el admin responde
+        unreadMessages[employeeId] = 0;
+        updateUnreadBadge(employeeId);
+        updateEmployeeItemInList(employeeId);
+        
+        input.value = '';
+        imageInput.value = '';
+      } catch (err) {
+        console.error('❌ Error enviando mensaje:', err);
+        alert('Error al enviar mensaje');
+      }
     }
 
     // === CAMBIAR ENTRE CHATS ===
